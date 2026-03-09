@@ -41,6 +41,7 @@
             <button class="admin-nav-btn" data-section="history"><i class="fa-solid fa-clock-rotate-left"></i>
                 Histórico</button>
             <button class="admin-nav-btn" data-section="products"><i class="fa-solid fa-box"></i> Produtos</button>
+            <button class="admin-nav-btn" data-section="categories"><i class="fa-solid fa-tags"></i> Categorias</button>
             <button class="admin-nav-btn" data-section="delivery"><i class="fa-solid fa-truck"></i> Taxas de
                 Entrega</button>
             <button class="admin-nav-btn" data-section="coupons"><i class="fa-solid fa-tag"></i> Cupons</button>
@@ -326,6 +327,146 @@
             </div>
         </div>
 
+        <!-- Categorias -->
+        <div id="categories" class="admin-section">
+            <div class="admin-card">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--spacing-lg); flex-wrap:wrap; gap:var(--spacing-sm);">
+                    <h2><i class="fa-solid fa-tags"></i> Gerenciar Categorias</h2>
+                    <button class="btn btn-success" onclick="adminSystem.openCategoryModal()">
+                        <i class="fa-solid fa-plus"></i> Nova Categoria
+                    </button>
+                </div>
+
+                <p style="color:var(--gray); margin-bottom:var(--spacing-lg);">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Crie e edite as categorias do cardápio. Os ícones são da biblioteca <strong>FontAwesome 6</strong> —
+                    use as classes como <code>fa-solid fa-burger</code>, <code>fa-solid fa-pizza-slice</code>, etc.
+                </p>
+
+                <div id="categories-grid"
+                    style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:var(--spacing-md);">
+                    <div style="text-align:center; padding:var(--spacing-xl); color:var(--gray);">
+                        <i class="fa-solid fa-spinner fa-spin"></i> Carregando...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Categoria -->
+        <div id="category-modal-overlay"
+            style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+            <div
+                style="background:#fff; border-radius:var(--radius-lg); padding:var(--spacing-xl); width:100%; max-width:480px; margin:var(--spacing-md); max-height:90vh; overflow-y:auto;">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--spacing-lg);">
+                    <h3 id="category-modal-title"><i class="fa-solid fa-tag"></i> Nova Categoria</h3>
+                    <button onclick="adminSystem.closeCategoryModal()"
+                        style="font-size:1.5rem; color:var(--gray); background:none; border:none; cursor:pointer;">&times;</button>
+                </div>
+
+                <form id="category-form">
+                    <input type="hidden" id="category-id">
+
+                    <div class="form-group" style="margin-bottom:var(--spacing-md);">
+                        <label class="form-label"><i class="fa-solid fa-signature"></i> Nome da Categoria *</label>
+                        <input type="text" id="category-name" class="form-control" placeholder="Ex: Hambúrgueres"
+                            required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:var(--spacing-md);">
+                        <label class="form-label"><i class="fa-solid fa-icons"></i> Classe do Ícone FontAwesome
+                            *</label>
+                        <input type="text" id="category-icon" class="form-control" placeholder="Ex: fa-solid fa-burger"
+                            oninput="adminSystem.previewCategoryIcon(this.value)">
+                        <small style="color:var(--gray);">Digite a classe FontAwesome, ex:
+                            <code>fa-solid fa-burger</code></small>
+                    </div>
+
+                    <!-- Preview do ícone + sugestões -->
+                    <div
+                        style="background:var(--cream); border-radius:var(--radius-md); padding:var(--spacing-md); margin-bottom:var(--spacing-md);">
+                        <p style="font-size:0.85rem; font-weight:600; margin-bottom:8px; color:var(--gray);">Preview e
+                            sugestões de ícones:</p>
+                        <div
+                            style="display:flex; align-items:center; gap:var(--spacing-md); margin-bottom:var(--spacing-sm);">
+                            <div id="icon-preview"
+                                style="font-size:2.5rem; color:var(--primary); min-width:48px; text-align:center;">
+                                <i class="fa-solid fa-tag"></i>
+                            </div>
+                            <span id="icon-preview-label" style="color:var(--gray); font-size:0.9rem;">Seu ícone
+                                aparecerá aqui</span>
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-burger')" title="Hambúrguer"><i
+                                    class="fa-solid fa-burger"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-pizza-slice')" title="Pizza"><i
+                                    class="fa-solid fa-pizza-slice"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-hotdog')" title="Cachorro-quente"><i
+                                    class="fa-solid fa-hotdog"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-drumstick-bite')" title="Frango"><i
+                                    class="fa-solid fa-drumstick-bite"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-fish')" title="Peixe"><i
+                                    class="fa-solid fa-fish"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-mug-hot')" title="Bebida quente"><i
+                                    class="fa-solid fa-mug-hot"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-wine-glass')" title="Bebida"><i
+                                    class="fa-solid fa-wine-glass"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-cake-candles')" title="Sobremesa"><i
+                                    class="fa-solid fa-cake-candles"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-ice-cream')" title="Sorvete"><i
+                                    class="fa-solid fa-ice-cream"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-bread-slice')" title="Pão"><i
+                                    class="fa-solid fa-bread-slice"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-egg')" title="Ovos"><i
+                                    class="fa-solid fa-egg"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-bowl-food')" title="Prato"><i
+                                    class="fa-solid fa-bowl-food"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-utensils')" title="Culinária"><i
+                                    class="fa-solid fa-utensils"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-cheese')" title="Queijo"><i
+                                    class="fa-solid fa-cheese"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-bottle-water')" title="Água"><i
+                                    class="fa-solid fa-bottle-water"></i></button>
+                            <button type="button" class="icon-suggestion"
+                                onclick="adminSystem.selectIcon('fa-solid fa-star')" title="Destaque"><i
+                                    class="fa-solid fa-star"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:var(--spacing-lg);">
+                        <label class="form-label"><i class="fa-solid fa-arrow-up-1-9"></i> Ordem de exibição</label>
+                        <input type="number" id="category-order" class="form-control" placeholder="Ex: 1, 2, 3..."
+                            min="1" value="1">
+                        <small style="color:var(--gray);">Categorias com número menor aparecem primeiro.</small>
+                    </div>
+
+                    <div style="display:flex; gap:var(--spacing-sm); justify-content:flex-end;">
+                        <button type="button" class="btn btn-secondary"
+                            onclick="adminSystem.closeCategoryModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-floppy-disk"></i> Salvar Categoria
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Taxas de Entrega -->
         <div id="delivery" class="admin-section">
             <div class="admin-card">
@@ -458,7 +599,8 @@
 
                     <div class="form-group">
                         <label class="form-label">Instagram</label>
-                        <input type="text" id="store-instagram" class="form-input" placeholder="@uaihamburgueriadochico">
+                        <input type="text" id="store-instagram" class="form-input"
+                            placeholder="@uaihamburgueriadochico">
                     </div>
                 </div>
 

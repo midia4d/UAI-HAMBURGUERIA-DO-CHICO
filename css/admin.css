@@ -936,3 +936,30 @@ input:checked+.toggle-slider:before {
     background: #6D28D9;
     transform: translateY(-1px);
 }
+
+/* Botões de sugestão de ícone no modal de categorias */
+.icon-suggestion {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+    background: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    color: var(--dark);
+    transition: all 0.15s ease;
+}
+
+.icon-suggestion:hover {
+    border-color: var(--primary);
+    background: rgba(230, 57, 70, 0.08);
+    color: var(--primary);
+    transform: scale(1.15);
+}
+
+.icon-suggestion:active {
+    transform: scale(0.95);
+}

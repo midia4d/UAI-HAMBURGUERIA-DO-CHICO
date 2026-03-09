@@ -133,6 +133,9 @@ class AdminSystem {
             case 'coupons':
                 this.loadCoupons();
                 break;
+            case 'categories':
+                this.loadCategories();
+                break;
             case 'orders':
                 this.loadOrders();
                 // Limpa badge ao entrar na aba
@@ -1730,9 +1733,181 @@ window.addEventListener('dataLoaded', (event) => {
 
 // Fallback caso os dados já estejam carregados
 document.addEventListener('DOMContentLoaded', () => {
-    // Se os dados já foram carregados antes do DOMContentLoaded
     if (typeof cachedData !== 'undefined' && cachedData !== null && !adminSystem) {
         adminSystem = new AdminSystem();
     }
 });
 
+// ============================================================
+// GERENCIAMENTO DE CATEGORIAS
+// ============================================================
+
+// Extensão da classe AdminSystem para categorias
+AdminSystem.prototype.loadCategories = async function () {
+    const grid = document.getElementById('categories-grid');
+    if (!grid) return;
+
+    grid.innerHTML = `<div style="text-align:center;padding:var(--spacing-xl);color:var(--gray);">
+        <i class="fa-solid fa-spinner fa-spin"></i> Carregando categorias...
+    </div>`;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('categories')
+            .select('*')
+            .order('display_order', { ascending: true });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            grid.innerHTML = `<div style="text-align:center;padding:var(--spacing-xl);color:var(--gray);">
+                <i class="fa-solid fa-tags" style="font-size:2rem;"></i>
+                <p style="margin-top:8px;">Nenhuma categoria encontrada. Crie a primeira!</p>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = data.map(cat => `
+            <div class="card" style="text-align:center; position:relative; transition: all 0.2s;">
+                <div style="font-size:2.5rem; color:var(--primary); margin-bottom:var(--spacing-sm);">
+                    <i class="${cat.icon}"></i>
+                </div>
+                <h3 style="font-size:1.1rem; margin-bottom:4px;">${cat.name}</h3>
+                <small style="color:var(--gray);">Ordem: ${cat.display_order}</small>
+                <small style="display:block; color:var(--gray); font-size:0.75rem; margin-top:4px; font-family:monospace;">${cat.icon}</small>
+                <div style="display:flex; gap:8px; justify-content:center; margin-top:var(--spacing-sm);">
+                    <button class="btn btn-secondary" style="padding:6px 14px; font-size:0.85rem;"
+                        onclick="adminSystem.openCategoryModal('${cat.id}', '${cat.name.replace(/'/g, "\\'")}', '${cat.icon}', ${cat.display_order})">
+                        <i class="fa-solid fa-pencil"></i> Editar
+                    </button>
+                    <button class="btn" style="padding:6px 14px; font-size:0.85rem; background:#FEE2E2; color:#B91C1C; border:none;"
+                        onclick="adminSystem.deleteCategory('${cat.id}', '${cat.name.replace(/'/g, "\\'")}')">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        // Atualizar select de categoria no formulário de produto
+        this.updateProductCategorySelect(data);
+
+    } catch (err) {
+        console.error('Erro ao carregar categorias:', err);
+        grid.innerHTML = `<div style="color:var(--primary);"><i class="fa-solid fa-triangle-exclamation"></i> Erro ao carregar categorias: ${err.message}</div>`;
+    }
+};
+
+AdminSystem.prototype.updateProductCategorySelect = function (categories) {
+    const select = document.getElementById('product-category');
+    if (!select) return;
+    const current = select.value;
+    select.innerHTML = '<option value="">Selecione...</option>' +
+        categories.map(c => `<option value="${c.id}"${c.id === current ? ' selected' : ''}>${c.name}</option>`).join('');
+};
+
+AdminSystem.prototype.openCategoryModal = function (id = '', name = '', icon = '', order = 1) {
+    const overlay = document.getElementById('category-modal-overlay');
+    const title = document.getElementById('category-modal-title');
+    document.getElementById('category-id').value = id;
+    document.getElementById('category-name').value = name;
+    document.getElementById('category-icon').value = icon;
+    document.getElementById('category-order').value = order;
+    title.innerHTML = id
+        ? '<i class="fa-solid fa-pencil"></i> Editar Categoria'
+        : '<i class="fa-solid fa-plus"></i> Nova Categoria';
+    this.previewCategoryIcon(icon || 'fa-solid fa-tag');
+    overlay.style.display = 'flex';
+
+    // Submit do form
+    const form = document.getElementById('category-form');
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        this.saveCategory();
+    };
+};
+
+AdminSystem.prototype.closeCategoryModal = function () {
+    document.getElementById('category-modal-overlay').style.display = 'none';
+};
+
+AdminSystem.prototype.previewCategoryIcon = function (iconClass) {
+    const preview = document.getElementById('icon-preview');
+    const label = document.getElementById('icon-preview-label');
+    if (!preview) return;
+    if (iconClass && iconClass.trim()) {
+        preview.innerHTML = `<i class="${iconClass.trim()}"></i>`;
+        if (label) label.textContent = iconClass.trim();
+    } else {
+        preview.innerHTML = `<i class="fa-solid fa-tag"></i>`;
+        if (label) label.textContent = 'Seu ícone aparecerá aqui';
+    }
+};
+
+AdminSystem.prototype.selectIcon = function (iconClass) {
+    document.getElementById('category-icon').value = iconClass;
+    this.previewCategoryIcon(iconClass);
+};
+
+AdminSystem.prototype.saveCategory = async function () {
+    const id = document.getElementById('category-id').value.trim();
+    const name = document.getElementById('category-name').value.trim();
+    const icon = document.getElementById('category-icon').value.trim();
+    const order = parseInt(document.getElementById('category-order').value) || 1;
+
+    if (!name) return alert('Digite o nome da categoria.');
+    if (!icon) return alert('Escolha ou digite um ícone FontAwesome.');
+
+    const btn = document.querySelector('#category-form button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+
+    try {
+        if (id) {
+            // UPDATE
+            const { error } = await supabaseClient
+                .from('categories')
+                .update({ name, icon, display_order: order })
+                .eq('id', id);
+            if (error) throw error;
+        } else {
+            // INSERT — gera ID a partir do nome
+            const newId = name.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-|-$/g, '');
+
+            const { error } = await supabaseClient
+                .from('categories')
+                .insert([{ id: newId, name, icon, display_order: order }]);
+            if (error) throw error;
+        }
+
+        this.closeCategoryModal();
+        this.loadCategories();
+        this.showToast(id ? 'Categoria atualizada!' : 'Categoria criada!', 'success');
+    } catch (err) {
+        console.error('Erro ao salvar categoria:', err);
+        alert('Erro ao salvar categoria: ' + (err.message || JSON.stringify(err)));
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar Categoria';
+    }
+};
+
+AdminSystem.prototype.deleteCategory = async function (id, name) {
+    if (!confirm(`Tem certeza que deseja excluir a categoria "${name}"?\n\nProdutos desta categoria ficarão sem categoria!`)) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('categories')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        this.loadCategories();
+        this.showToast('Categoria excluída!', 'success');
+    } catch (err) {
+        console.error('Erro ao excluir categoria:', err);
+        alert('Erro ao excluir: ' + err.message);
+    }
+};
