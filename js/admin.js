@@ -38,8 +38,8 @@ class AdminSystem {
         }
     }
 
-    // Login
-    async login(email, password) {
+    // Login (usa email fixo temporário)
+    async login(password) {
         try {
             const btn = document.querySelector('#login-form button');
             if (btn) {
@@ -47,8 +47,11 @@ class AdminSystem {
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Entrando...';
             }
 
+            // Temporário: usa e-mail fixo enquanto o cliente não cadastra o próprio
+            const fixedEmail = 'admin@uaihamburgueria.com';
+
             const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: email,
+                email: fixedEmail,
                 password: password,
             });
 
@@ -58,7 +61,6 @@ class AdminSystem {
             window.location.reload();
             return true;
         } catch (error) {
-            alert('Falha no login: Email ou senha incorretos.');
             console.error('Login erro:', error);
 
             const btn = document.querySelector('#login-form button');
@@ -92,12 +94,12 @@ class AdminSystem {
           </div>
           
           <form id="login-form">
-            <div class="form-group">
+            <div class="form-group" style="display: none;">
               <label class="form-label" for="admin-email">E-mail</label>
-              <input type="email" id="admin-email" class="form-control" required placeholder="admin@uaihamburgueria.com">
+              <input type="email" id="admin-email" value="admin@uaihamburgueria.com" class="form-control">
             </div>
             <div class="form-group">
-              <label class="form-label" for="admin-password">Senha</label>
+              <label class="form-label" for="admin-password">Senha de Acesso</label>
               <input type="password" id="admin-password" class="form-input" placeholder="Digite a senha" required autofocus>
             </div>
             
@@ -106,7 +108,7 @@ class AdminSystem {
             </button>
             
             <div id="login-error" class="alert alert-danger hidden" style="margin-top: var(--spacing-md);">
-              Senha incorreta!
+              Erro ao fazer login com estas credenciais.
             </div>
           </form>
           
@@ -119,14 +121,13 @@ class AdminSystem {
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('admin-email').value;
             const password = document.getElementById('admin-password').value;
 
-            const success = await this.login(email, password);
+            const success = await this.login(password);
             if (!success) {
                 const errDiv = document.getElementById('login-error');
                 errDiv.classList.remove('hidden');
-                errDiv.textContent = 'Erro ao fazer login com estas credenciais.';
+                errDiv.textContent = 'Senha incorreta para a conta da loja.';
             }
         });
     }
