@@ -580,6 +580,51 @@ class SupabaseDataManager {
     }
 
     // ============================================
+    // STORAGE - UPLOAD DE IMAGEM
+    // ============================================
+    async uploadProductImage(file) {
+        try {
+            if (!file) return { success: false, error: 'Nenhum arquivo providenciado' };
+
+            // Gerar um nome único
+            const fileExt = file.name.split('.').pop();
+            const fileName = `prod_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+
+            // Em casos onde RLS buga o supabase.storage SDK, um POST REST resolve forçadamente:
+            const uploadUrl = `${SUPABASE_URL}/storage/v1/object/products/${fileName}`;
+
+            const response = await fetch(uploadUrl, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_PUBLISHABLE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+                    'Content-Type': file.type,
+                    'cache-control': '3600'
+                },
+                body: file
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error("Erro Fetch Upload:", errorData);
+                throw new Error(errorData.message || errorData.error || 'Erro na requisição');
+            }
+
+            // O endpoint de URL público é predeterminado no Supabase (se o bucket é publico)
+            const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/products/${fileName}`;
+
+            return { success: true, url: publicUrl };
+        } catch (error) {
+            console.error('Erro ao fazer upload de imagem:', error);
+            let errorMsg = error.message;
+            if (errorMsg.includes('The resource was not found') || errorMsg.includes('Bucket not found')) {
+                errorMsg = 'O bucket "products" não existe no Supabase Storage ou a permissão ainda está bloqueando.';
+            }
+            return { success: false, error: errorMsg };
+        }
+    }
+
+    // ============================================
     // MÉTODO PARA CARREGAR TODOS OS DADOS
     // ============================================
 

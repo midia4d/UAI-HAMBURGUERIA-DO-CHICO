@@ -121,23 +121,30 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Triggers para atualizar automaticamente updated_at
+DROP TRIGGER IF EXISTS update_categories_updated_at ON categories;
 CREATE TRIGGER update_categories_updated_at BEFORE UPDATE ON categories
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_products_updated_at ON products;
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_delivery_fees_updated_at ON delivery_fees;
 CREATE TRIGGER update_delivery_fees_updated_at BEFORE UPDATE ON delivery_fees
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_config_updated_at ON config;
 CREATE TRIGGER update_config_updated_at BEFORE UPDATE ON config
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_store_info_updated_at ON store_info;
 CREATE TRIGGER update_store_info_updated_at BEFORE UPDATE ON store_info
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_orders_updated_at ON orders;
 CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 
 -- ============================================
 -- 8. POLÍTICAS RLS (ROW LEVEL SECURITY)
@@ -152,20 +159,41 @@ ALTER TABLE store_info ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de LEITURA PÚBLICA (qualquer um pode ler)
+DROP POLICY IF EXISTS "Permitir leitura pública de categorias" ON categories;
 CREATE POLICY "Permitir leitura pública de categorias" ON categories FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Permitir leitura pública de produtos" ON products;
 CREATE POLICY "Permitir leitura pública de produtos" ON products FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Permitir leitura pública de taxas de entrega" ON delivery_fees;
 CREATE POLICY "Permitir leitura pública de taxas de entrega" ON delivery_fees FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Permitir leitura pública de configurações" ON config;
 CREATE POLICY "Permitir leitura pública de configurações" ON config FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Permitir leitura pública de informações da loja" ON store_info;
 CREATE POLICY "Permitir leitura pública de informações da loja" ON store_info FOR SELECT USING (true);
 
 -- Políticas de ESCRITA PÚBLICA (temporário - para desenvolvimento sem autenticação)
 -- IMPORTANTE: Em produção, você deve restringir isso apenas para usuários autenticados como admin
+DROP POLICY IF EXISTS "Permitir escrita em categorias" ON categories;
 CREATE POLICY "Permitir escrita em categorias" ON categories FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Permitir escrita em produtos" ON products;
 CREATE POLICY "Permitir escrita em produtos" ON products FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Permitir escrita em taxas de entrega" ON delivery_fees;
 CREATE POLICY "Permitir escrita em taxas de entrega" ON delivery_fees FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Permitir escrita em configurações" ON config;
 CREATE POLICY "Permitir escrita em configurações" ON config FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Permitir escrita em informações da loja" ON store_info;
 CREATE POLICY "Permitir escrita em informações da loja" ON store_info FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Permitir escrita em pedidos" ON orders;
 CREATE POLICY "Permitir escrita em pedidos" ON orders FOR ALL USING (true);
+
 
 -- ============================================
 -- 9. DADOS INICIAIS
@@ -249,7 +277,42 @@ ON CONFLICT (id) DO NOTHING;
 -- Próximo passo: configurar o cliente JavaScript
 
 -- ============================================
--- 10. TABELA DE CUPONS DE DESCONTO
+-- 10. SETUP DO STORAGE DE IMAGENS (BUCKET)
+-- ============================================
+
+-- Garante que as policies de storage antigas não conflitem
+DROP POLICY IF EXISTS "Imagens de produtos são publicamente acessíveis" ON storage.objects;
+DROP POLICY IF EXISTS "Permitir upload anonimo para products" ON storage.objects;
+
+-- Cria o bucket explicitamente como "publico"
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('products', 'products', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Permite todo tipo de select público
+CREATE POLICY "Imagens de produtos são publicamente acessíveis"
+  ON storage.objects FOR SELECT
+  USING ( bucket_id = 'products' );
+
+-- Permite Upload universal (qualquer pessoa para demonstração)
+CREATE POLICY "Permitir upload anonimo para products"
+  ON storage.objects FOR INSERT
+  WITH CHECK ( bucket_id = 'products' );
+
+-- Permite deleção/edição pelo banco
+DROP POLICY IF EXISTS "Permitir deleção para products" ON storage.objects;
+CREATE POLICY "Permitir deleção para products"
+  ON storage.objects FOR DELETE
+  USING ( bucket_id = 'products' );
+
+DROP POLICY IF EXISTS "Permitir update para products" ON storage.objects;
+CREATE POLICY "Permitir update para products"
+  ON storage.objects FOR UPDATE
+  USING ( bucket_id = 'products' );
+
+
+-- ============================================
+-- 11. TABELA DE CUPONS DE DESCONTO
 -- ============================================
 CREATE TABLE IF NOT EXISTS coupons (
     id SERIAL PRIMARY KEY,
@@ -265,8 +328,13 @@ CREATE TABLE IF NOT EXISTS coupons (
 );
 
 ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Leitura publica de cupons" ON coupons;
 CREATE POLICY "Leitura publica de cupons" ON coupons FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Escrita de cupons" ON coupons;
 CREATE POLICY "Escrita de cupons" ON coupons FOR ALL USING (true);
+
 
 -- Cupons de exemplo
 INSERT INTO coupons (code, type, value, active, min_order, description) VALUES

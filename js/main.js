@@ -212,10 +212,18 @@ class UaiPizzaria {
             return;
         }
 
-        container.innerHTML = products.map(product => `
+        container.innerHTML = products.map(product => {
+            const hasImage = !!product.image;
+            const imageHtml = hasImage
+                ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">`
+                : `<div style="background: linear-gradient(135deg, #E63946 0%, #F77F00 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                    ${this.getCategoryIcon(product.category)}
+                   </div>`;
+
+            return `
       <div class="card">
-        <div class="card-image" style="background: linear-gradient(135deg, #E63946 0%, #F77F00 100%); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
-          ${this.getCategoryIcon(product.category)}
+        <div class="card-image" style="padding: 0; overflow: hidden; background: #f0f0f0;">
+          ${imageHtml}
         </div>
         <h3 class="card-title">${product.name}</h3>
         <p class="card-description">${product.description}</p>
@@ -227,7 +235,8 @@ class UaiPizzaria {
           </button>
         </div>
       </div>
-    `).join('');
+    `;
+        }).join('');
     }
 
     // Obtém ícone da categoria
@@ -250,3 +259,13 @@ window.app = null;
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new UaiPizzaria();
 });
+
+window.addEventListener('dataLoaded', (e) => {
+    if (window.app) {
+        window.app.data = e.detail || getData();
+        window.app.init(); // Re-roda para aplicar novas flags (fechado/aberto)
+    } else {
+        window.app = new UaiPizzaria();
+    }
+});
+

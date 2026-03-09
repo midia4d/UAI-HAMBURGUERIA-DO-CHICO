@@ -289,14 +289,41 @@ class AdminSystem {
             document.getElementById('product-description').value = product.description;
             document.getElementById('product-price').value = product.price;
             document.getElementById('product-available').value = product.available.toString();
-            document.getElementById('product-image').value = product.image || '';
+
+            // Preview de imagem na nova UI Box
+            const previewImg = document.getElementById('product-image-preview');
+            const placeholder = document.getElementById('image-upload-placeholder');
+            const removeBtn = document.getElementById('remove-image-btn');
+            const urlInput = document.getElementById('product-image-url');
+
+            if (product.image) {
+                previewImg.style.display = 'block';
+                previewImg.src = product.image;
+                urlInput.value = product.image;
+                placeholder.style.display = 'none';
+                removeBtn.style.display = 'block';
+            } else {
+                previewImg.style.display = 'none';
+                previewImg.src = '';
+                urlInput.value = '';
+                placeholder.style.display = 'flex';
+                removeBtn.style.display = 'none';
+            }
         } else {
             // Modo adicionar
             modalTitle.textContent = 'Adicionar Produto';
             modalSubmitText.textContent = 'Adicionar Produto';
             document.getElementById('product-id').value = '';
             document.getElementById('product-available').value = 'true';
+
+            document.getElementById('product-image-preview').style.display = 'none';
+            document.getElementById('product-image-preview').src = '';
+            document.getElementById('product-image-url').value = '';
+            document.getElementById('image-upload-placeholder').style.display = 'flex';
+            document.getElementById('remove-image-btn').style.display = 'none';
         }
+
+        document.getElementById('product-image-file').value = '';
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -307,37 +334,123 @@ class AdminSystem {
         const modal = document.getElementById('product-modal');
         modal.classList.remove('active');
         document.body.style.overflow = '';
+        document.getElementById('product-image-file').value = '';
     }
+
+    // Preview
+    handleImageSelect(event) {
+        const file = event.target.files[0];
+        const previewImg = document.getElementById('product-image-preview');
+        const placeholder = document.getElementById('image-upload-placeholder');
+        const removeBtn = document.getElementById('remove-image-btn');
+
+        if (!file) {
+            // Se cancelar a janela
+            return;
+        }
+
+        // Validar tamanho (Max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            this.showAlert('A imagem não pode ultrapassar 2MB!', 'danger');
+            event.target.value = '';
+            return;
+        }
+
+        // Mostrar Preview Local (URL blob)
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = 'block';
+            placeholder.style.display = 'none';
+            removeBtn.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+
+    // Deleta do form / remove preview
+    removeImage(event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        document.getElementById('product-image-file').value = '';
+        document.getElementById('product-image-url').value = '';
+        document.getElementById('product-image-preview').src = '';
+        document.getElementById('product-image-preview').style.display = 'none';
+
+        document.getElementById('image-upload-placeholder').style.display = 'flex';
+        document.getElementById('remove-image-btn').style.display = 'none';
+    }
+
 
     // Salva produto (adicionar ou editar)
     async saveProduct() {
-        const productId = document.getElementById('product-id').value;
-        const productData = {
-            name: document.getElementById('product-name').value,
-            category: document.getElementById('product-category').value,
-            description: document.getElementById('product-description').value,
-            price: parseFloat(document.getElementById('product-price').value),
-            available: document.getElementById('product-available').value === 'true',
-            image: document.getElementById('product-image').value || null
-        };
+        // Obter botão de salvar para indicar loading
+        const btnSubmit = document.querySelector('#product-form button[type="submit"]');
+        const textSpan = document.getElementById('modal-submit-text');
+        const defaultText = textSpan.textContent;
+        if (btnSubmit) btnSubmit.disabled = true;
+        textSpan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
 
-        if (productId) {
-            // Editar produto existente
-            const result = await dbManager.updateProduct(productId, productData);
+        try {
+            const productId = document.getElementById('product-id').value;
+            const fileInput = document.getElementById('product-image-file');
 
-            if (result.success) {
-                this.data = await loadDataFromSupabase();
-                this.loadProducts();
-                this.showAlert('Produto atualizado com sucesso!', 'success');
-            } else {
-                this.showAlert('Erro ao atualizar produto: ' + result.error, 'danger');
+            let imageUrlUrl = document.getElementById('product-image-url').value || null;
+
+            // Se o usuário selecionou uma nova imagem
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const uploadResult = await dbManager.uploadProductImage(file);
+                if (uploadResult.success) {
+                    imageUrlUrl = uploadResult.url;
+                } else {
+                    this.showAlert('Erro ao fazer upload da imagem: ' + uploadResult.error, 'danger');
+                    if (btnSubmit) btnSubmit.disabled = false;
+                    textSpan.textContent = defaultText;
+                    return; // Aborta salvar produto se a img falhar
+                }
             }
-        } else {
-            // Adicionar novo produto
-            await this.addProduct(productData);
-        }
 
-        this.closeProductModal();
+            const productData = {
+                name: document.getElementById('product-name').value,
+                category: document.getElementById('product-category').value,
+                description: document.getElementById('product-description').value,
+                price: parseFloat(document.getElementById('product-price').value),
+                available: document.getElementById('product-available').value === 'true',
+                image: imageUrlUrl
+            };
+
+            if (productId) {
+                // Editar produto existente
+                const result = await dbManager.updateProduct(productId, productData);
+
+                if (result.success) {
+                    this.data = await loadDataFromSupabase();
+                    this.loadProducts();
+                    this.showAlert('Produto atualizado com sucesso!', 'success');
+                } else {
+                    this.showAlert('Erro ao atualizar produto: ' + result.error, 'danger');
+                }
+            } else {
+                // Adicionar novo produto - AddProduct local e depois chama function do manager
+                productData.id = 'product-' + Date.now();
+                const result = await dbManager.addProduct(productData);
+                if (result.success) {
+                    this.data = await loadDataFromSupabase();
+                    this.loadProducts();
+                    this.showAlert('Produto adicionado com sucesso!', 'success');
+                } else {
+                    this.showAlert('Erro ao adicionar produto: ' + result.error, 'danger');
+                }
+            }
+
+            this.closeProductModal();
+        } catch (error) {
+            console.error(error);
+            this.showAlert('Ocorreu um erro ao salvar o produto.', 'danger');
+        } finally {
+            if (btnSubmit) btnSubmit.disabled = false;
+        }
     }
 
     // Carrega configurações
@@ -1151,6 +1264,72 @@ class AdminSystem {
             });
     }
 
+    async saveSettings() {
+        const btn = document.querySelector('button[onclick="adminSystem.saveSettings()"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+        }
+
+        try {
+            // Objeto de Configuração
+            const configData = {
+                site_paused: document.getElementById('site-paused').checked,
+                orders_enabled: document.getElementById('orders-enabled').checked,
+                whatsapp_number: document.getElementById('whatsapp-number').value.replace(/\D/g, ''),
+                free_delivery_minimum: parseFloat(document.getElementById('free-delivery-min').value) || 0,
+                estimated_delivery_time: document.getElementById('delivery-time').value,
+                welcome_message: document.getElementById('welcome-message').value,
+                tagline: document.getElementById('tagline').value,
+                delivery_banner: document.getElementById('delivery-banner').value
+            };
+
+            // Se digitou algo na senha, atualiza
+            const newPassword = document.getElementById('admin-password-input').value;
+            if (newPassword && newPassword.trim() !== '') {
+                configData.admin_password = newPassword.trim();
+            }
+
+            // Objeto StoreInfo
+            const storeInfoData = {
+                name: 'Uai Pizzaria & Doceria', // Fixo por enquanto
+                address: document.getElementById('store-address').value,
+                address_complement: document.getElementById('store-complement').value,
+                phone: document.getElementById('store-phone').value,
+                instagram: document.getElementById('store-instagram').value,
+                // Mantém os horários antigos se não houver edição no form
+                hours_weekdays: this.data.storeInfo.hours?.weekdays || 'Segunda a Sábado: 16:00 às 03:00',
+                hours_sunday: this.data.storeInfo.hours?.sunday || 'Domingo: 20:00 às 03:00'
+            };
+
+            // Chamadas ao dbManager
+            const resConfig = await dbManager.updateConfig(configData);
+            const resStore = await dbManager.updateStoreInfo(storeInfoData);
+
+            if (resConfig.success && resStore.success) {
+                this.showAlert('Configurações salvas com sucesso!', 'success');
+                // Força um recarregamento dos dados
+                await refreshData();
+                this.data = getData();
+                if (newPassword && newPassword.trim() !== '') {
+                    this.showAlert('Senha alterada. Você precisará logar novamente.', 'warning');
+                    setTimeout(() => this.logout(), 2000);
+                }
+            } else {
+                this.showAlert('Erro ao salvar algumas configurações.', 'danger');
+                console.error('Erros de salvamento:', resConfig.error, resStore.error);
+            }
+        } catch (error) {
+            console.error('Failed to save settings:', error);
+            this.showAlert('Erro inesperado ao salvar configurações.', 'danger');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Salvar Todas as Configurações';
+            }
+        }
+    }
+
     // ========== RELATÓRIOS ==========
 
     async loadReports(days = 7) {
@@ -1454,12 +1633,13 @@ class AdminSystem {
             });
         }
 
-        modal.classList.remove('hidden');
+        modal.classList.add('active');
     }
 
     closeCouponModal() {
-        document.getElementById('coupon-modal')?.classList.add('hidden');
+        document.getElementById('coupon-modal')?.classList.remove('active');
     }
+
 
     onCouponTypeChange() {
         const type = document.getElementById('coupon-form-type')?.value;
