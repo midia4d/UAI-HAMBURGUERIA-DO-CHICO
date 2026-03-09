@@ -76,7 +76,7 @@ class UaiPizzaria {
         if (heroContent) {
             heroContent.innerHTML = `
         <div class="closed-message fade-in">
-          <h1 class="hero-title">😴 ${this.data.messages.closedMessage}</h1>
+          <h1 class="hero-title"><i class="fa-solid fa-moon" style="color:#F77F00;"></i> ${this.data.messages.closedMessage}</h1>
           <div class="hero-banner">
             <p class="hero-banner-text">
               Segunda a Sábado: ${this.data.storeInfo.hours.weekdays}<br>
@@ -94,7 +94,7 @@ class UaiPizzaria {
         if (banner) {
             banner.innerHTML = `
         <p class="hero-banner-text">
-          📍 ${this.data.storeInfo.hours.weekdays}<br>
+          <i class="fa-solid fa-location-dot" style="color:#E63946;"></i> ${this.data.storeInfo.hours.weekdays}<br>
           ${this.data.storeInfo.hours.sunday}
         </p>
       `;
@@ -230,7 +230,7 @@ class UaiPizzaria {
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <span class="card-price">${this.formatPrice(product.price)}</span>
           <button class="btn btn-primary" onclick="window.location.href='pedido.html?product=${product.id}'">
-            <span class="btn-icon">🛒</span>
+            <span class="btn-icon"><i class="fa-solid fa-cart-shopping"></i></span>
             Adicionar
           </button>
         </div>
@@ -242,7 +242,7 @@ class UaiPizzaria {
     // Obtém ícone da categoria
     getCategoryIcon(categoryId) {
         const category = this.getCategoryById(categoryId);
-        return category ? category.icon : '🍽️';
+        return category ? `<i class="${category.icon}" style="font-size:1.5rem;"></i>` : '<i class="fa-solid fa-utensils"></i>';
     }
 
     // Adiciona ao pedido e redireciona para página de pedido

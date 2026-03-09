@@ -499,7 +499,7 @@
                 <h3>Exportar Dados</h3>
                 <p>Baixe um arquivo JSON com todos os dados do sistema.</p>
                 <button class="btn btn-success" onclick="adminSystem.exportData()">
-                    📥 Exportar Backup
+                    <i class="fa-solid fa-download"></i> Exportar Backup
                 </button>
 
                 <h3 style="margin-top: var(--spacing-xl);">Importar Dados</h3>
@@ -507,7 +507,7 @@
                 <input type="file" id="import-file" accept=".json" style="display: none;"
                     onchange="adminSystem.importData(this.files[0])">
                 <button class="btn btn-warning" onclick="document.getElementById('import-file').click()">
-                    📤 Importar Backup
+                    <i class="fa-solid fa-upload"></i> Importar Backup
                 </button>
 
                 <div class="alert alert-danger" style="margin-top: var(--spacing-lg);">
@@ -548,10 +548,10 @@
                             </label>
                             <select id="product-category" class="form-select" required>
                                 <option value="">Selecione...</option>
-                                <option value="pizzas">🍕 Pizzas</option>
-                                <option value="doces">🍰 Doces</option>
-                                <option value="bebidas">🥤 Bebidas</option>
-                                <option value="salgados">🥐 Salgados</option>
+                                <option value="pizzas">Pizzas</option>
+                                <option value="doces">Doces</option>
+                                <option value="bebidas">Bebidas</option>
+                                <option value="salgados">Salgados</option>
                             </select>
                         </div>
                     </div>
@@ -579,8 +579,8 @@
                                 Status
                             </label>
                             <select id="product-available" class="form-select">
-                                <option value="true">✅ Disponível</option>
-                                <option value="false">❌ Indisponível</option>
+                                <option value="true">Disponível</option>
+                                <option value="false">Indisponível</option>
                             </select>
                         </div>
                     </div>

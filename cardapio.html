@@ -233,7 +233,7 @@
                     .sort((a, b) => a.order - b.order)
                     .map(cat => `
             <button class="category-tab" data-category="${cat.id}">
-              <span>${cat.icon}</span>
+              <span><i class="${cat.icon}"></i></span>
               <span>${cat.name}</span>
             </button>
           `).join('');

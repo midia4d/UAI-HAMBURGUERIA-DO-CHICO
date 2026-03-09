@@ -144,10 +144,10 @@ function getFallbackData() {
             }
         },
         categories: [
-            { id: 'pizzas', name: 'Pizzas', icon: '🍕', order: 1 },
-            { id: 'doces', name: 'Doces', icon: '🍰', order: 2 },
-            { id: 'bebidas', name: 'Bebidas', icon: '🥤', order: 3 },
-            { id: 'salgados', name: 'Salgados', icon: '🥟', order: 4 }
+            { id: 'pizzas', name: 'Pizzas', icon: 'fa-solid fa-pizza-slice', order: 1 },
+            { id: 'doces', name: 'Doces', icon: 'fa-solid fa-cake-candles', order: 2 },
+            { id: 'bebidas', name: 'Bebidas', icon: 'fa-solid fa-mug-hot', order: 3 },
+            { id: 'salgados', name: 'Salgados', icon: 'fa-solid fa-bread-slice', order: 4 }
         ],
         products: [],
         deliveryFees: [

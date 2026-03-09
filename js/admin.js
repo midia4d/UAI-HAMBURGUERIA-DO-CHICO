@@ -50,7 +50,7 @@ class AdminSystem {
       <div class="login-container">
         <div class="login-card">
           <div style="text-align: center; margin-bottom: var(--spacing-xl);">
-            <div style="font-size: 4rem; margin-bottom: var(--spacing-sm);">🍕</div>
+            <div style="font-size: 4rem; margin-bottom: var(--spacing-sm);"><i class="fa-solid fa-pizza-slice" style="color:var(--primary);"></i></div>
             <h1>Painel Admin</h1>
             <p style="color: var(--gray);">Uai Pizzaria & Doceria</p>
           </div>
@@ -643,7 +643,7 @@ class AdminSystem {
         if (label) label.textContent = `${filtered.length} pedido(s)`;
 
         if (filtered.length === 0) {
-            list.innerHTML = '<div class="orders-empty"><div style="font-size:3rem;">📋</div><p>Nenhum pedido neste filtro</p></div>';
+            list.innerHTML = '<div class="orders-empty"><div style="font-size:3rem; color: var(--gray);"><i class="fa-solid fa-clipboard-list"></i></div><p>Nenhum pedido neste filtro</p></div>';
             return;
         }
 
@@ -698,7 +698,7 @@ class AdminSystem {
                 <div>
                     <div class="order-id">#${order.id} &bull; <span class="order-time">${dateStr} às ${timeStr}</span></div>
                     <div class="order-customer">${order.customer_name}</div>
-                    <div class="order-phone">📱 ${order.customer_phone}</div>
+                    <div class="order-phone"><i class="fa-solid fa-phone"></i> ${order.customer_phone}</div>
                 </div>
                 <span class="order-status-badge ${statusBadges[order.status] || ''}">${statusLabels[order.status] || order.status}</span>
             </div>
@@ -1201,7 +1201,7 @@ class AdminSystem {
         const toast = document.createElement('div');
         toast.className = 'new-order-toast';
         toast.innerHTML = `
-            <span style="font-size:1.5rem;">🔔</span>
+            <span style="font-size:1.5rem;"><i class="fa-solid fa-bell"></i></span>
             <div>
                 <div>Novo Pedido!</div>
                 <div style="font-size:0.85rem;font-weight:400;">${order.customer_name} — R$ ${parseFloat(order.total).toFixed(2).replace('.', ',')}</div>

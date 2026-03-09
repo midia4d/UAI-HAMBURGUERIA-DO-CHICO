@@ -217,7 +217,7 @@
       if (categoriesContainer) {
         categoriesContainer.innerHTML = data.categories.map(cat => `
           <a href="cardapio.html#${cat.id}" class="card text-center" style="text-decoration: none;">
-            <div style="font-size: 4rem; margin-bottom: 1rem;">${cat.icon}</div>
+            <div style="font-size: 3rem; margin-bottom: 1rem; color: var(--primary);"><i class="${cat.icon}"></i></div>
             <h3>${cat.name}</h3>
           </a>
         `).join('');
