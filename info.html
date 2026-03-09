@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Informações sobre a Uai Pizzaria & Doceria - Horário, localização e contato">
+    <meta name="theme-color" content="#E63946">
+
+    <title>Informações - Uai Pizzaria & Doceria</title>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-header {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: calc(70px + var(--spacing-xl)) var(--spacing-md) var(--spacing-xl);
+            text-align: center;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .info-card h2 {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            color: var(--primary);
+        }
+
+        .info-card-icon {
+            font-size: 2rem;
+        }
+
+        .info-item {
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .info-value {
+            font-size: 1.125rem;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 300px;
+            background: var(--light-gray);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: var(--spacing-md);
+        }
+
+        .social-links {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .social-link {
+            flex: 1;
+            padding: var(--spacing-md);
+            background: var(--gradient-primary);
+            color: var(--white);
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-weight: 600;
+            transition: all var(--transition-base);
+        }
+
+        .social-link:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <span class="logo-icon"><i class="fa-solid fa-pizza-slice"></i></span>
+                <span>Uai Pizzaria</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="cardapio.html" class="nav-link">Cardápio</a></li>
+                <li><a href="pedido.html" class="nav-link">Fazer Pedido</a></li>
+                <li><a href="info.html" class="nav-link">Informações</a></li>
+            </ul>
+
+            <button class="menu-toggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Informações</h1>
+        <p>Tudo que você precisa saber sobre nós</p>
+    </div>
+
+    <!-- Main Content -->
+    <section class="section">
+        <div class="container">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <!-- Horário de Funcionamento -->
+                <div class="info-card">
+                    <h2>
+                        <span class="info-card-icon"><i class="fa-solid fa-clock"></i></span>
+                        Horário de Funcionamento
+                    </h2>
+
+                    <div class="info-item">
+                        <div class="info-label">Segunda a Sábado</div>
+                        <div class="info-value" id="hours-weekdays">16:00 às 03:00</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Domingo</div>
+                        <div class="info-value" id="hours-sunday">20:00 às 03:00</div>
+                    </div>
+                </div>
+
+                <!-- Localização -->
+                <div class="info-card">
+                    <h2>
+                        <span class="info-card-icon"><i class="fa-solid fa-location-dot"></i></span>
+                        Nossa Localização
+                    </h2>
+
+                    <div class="info-item">
+                        <div class="info-label">Endereço</div>
+                        <div class="info-value" id="address">Rua Alagoas, 70B – Cristo Redentor</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Referência</div>
+                        <div class="info-value" id="address-complement">Do lado do Hotel Mirian / atrás da rodoviária
+                        </div>
+                    </div>
+
+                    <div class="map-container">
+                        <div style="text-align: center; color: var(--gray);">
+                            <div style="font-size: 3rem; margin-bottom: var(--spacing-sm);"><i
+                                    class="fa-solid fa-location-dot"></i></div>
+                            <p>Rua Alagoas, 70B – Cristo Redentor</p>
+                            <p style="font-size: 0.875rem;">Do lado do Hotel Mirian / atrás da rodoviária</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery -->
+                <div class="info-card">
+                    <h2>
+                        <span class="info-card-icon"><i class="fa-solid fa-truck"></i></span>
+                        Delivery
+                    </h2>
+
+                    <div class="info-item">
+                        <div class="info-label">Tempo de Entrega</div>
+                        <div class="info-value" id="delivery-time">45 a 60 minutos</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Entrega Grátis</div>
+                        <div class="info-value">Pedidos acima de <strong style="color: var(--primary);">R$
+                                60,00</strong></div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Taxas de Entrega</div>
+                        <div id="delivery-fees" style="margin-top: var(--spacing-sm);">
+                            <!-- Carregado via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contato -->
+                <div class="info-card">
+                    <h2>
+                        <span class="info-card-icon"><i class="fab fa-whatsapp"></i></span>
+                        Contato
+                    </h2>
+
+                    <div class="info-item">
+                        <div class="info-label">Telefone</div>
+                        <div class="info-value" id="phone">(31) 99999-9999</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Instagram</div>
+                        <div class="info-value" id="instagram">@uaipizzaria</div>
+                    </div>
+
+                    <div class="social-links">
+                        <a href="#" id="whatsapp-link" class="social-link">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <a href="#" id="instagram-link" class="social-link"
+                            style="background: linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #F77737 100%);">
+                            <i class="fab fa-instagram"></i> Instagram
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Sobre -->
+                <div class="info-card">
+                    <h2>
+                        <span class="info-card-icon"><i class="fa-solid fa-heart"></i></span>
+                        Sobre Nós
+                    </h2>
+
+                    <p style="font-size: 1.125rem; line-height: 1.8;">
+                        Na <strong>Uai Pizzaria & Doceria</strong>, acreditamos que toda história de amor merece um bom
+                        começo.
+                        Por isso, preparamos cada pizza e doce com muito carinho e ingredientes de qualidade.
+                    </p>
+
+                    <p style="font-size: 1.125rem; line-height: 1.8; margin-top: var(--spacing-md);">
+                        Seja para um jantar especial, uma festa ou aquele momento de vontade,
+                        estamos aqui para tornar sua experiência ainda mais saborosa!
+                    </p>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a href="pedido.html" class="btn btn-primary btn-large">
+                        <span class="btn-icon"><i class="fab fa-whatsapp"></i></span>
+                        Fazer Pedido Agora
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Uai Pizzaria & Doceria</h3>
+                    <p>Porque toda história de amor merece um bom começo</p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Horário de Funcionamento</h3>
+                    <p id="footer-hours-weekdays"></p>
+                    <p id="footer-hours-sunday"></p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Localização</h3>
+                    <p id="footer-address"></p>
+                    <p id="footer-address-complement"></p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <a href="#" id="footer-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a href="#" id="footer-instagram"><i class="fab fa-instagram"></i> Instagram</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Uai Pizzaria & Doceria. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="#" class="whatsapp-float" aria-label="WhatsApp">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M16 0C7.164 0 0 7.163 0 16c0 2.826.736 5.587 2.138 8.024L.07 31.765l8.026-2.052A15.93 15.93 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.455c-2.516 0-4.97-.702-7.095-2.03l-.51-.304-5.29 1.353 1.38-5.16-.334-.53A13.39 13.39 0 0 1 2.545 16c0-7.42 6.035-13.455 13.455-13.455S29.455 8.58 29.455 16 23.42 29.455 16 29.455z" />
+            <path
+                d="M23.14 19.47c-.39-.195-2.31-1.14-2.67-1.27-.36-.13-.62-.195-.88.195-.26.39-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.195-1.645-.606-3.133-1.933-1.158-1.033-1.94-2.31-2.168-2.7-.228-.39-.024-.6.17-.795.175-.175.39-.455.585-.683.195-.228.26-.39.39-.65.13-.26.065-.487-.033-.683-.098-.195-.88-2.12-1.205-2.9-.317-.76-.64-.657-.88-.67-.228-.013-.487-.016-.747-.016s-.683.098-1.04.487c-.357.39-1.363 1.333-1.363 3.25s1.396 3.77 1.59 4.03c.195.26 2.745 4.19 6.65 5.875.93.402 1.656.642 2.222.822.934.297 1.785.255 2.458.155.75-.112 2.31-.944 2.635-1.856.325-.912.325-1.694.228-1.856-.098-.162-.358-.26-.748-.455z" />
+        </svg>
+    </a>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = getData();
+
+            // Atualiza informações
+            document.getElementById('hours-weekdays').textContent = data.storeInfo.hours.weekdays;
+            document.getElementById('hours-sunday').textContent = data.storeInfo.hours.sunday;
+            document.getElementById('address').textContent = data.storeInfo.address;
+            document.getElementById('address-complement').textContent = data.storeInfo.addressComplement;
+            document.getElementById('phone').textContent = data.storeInfo.phone;
+            document.getElementById('instagram').textContent = data.storeInfo.instagram;
+            document.getElementById('delivery-time').textContent = data.config.estimatedDeliveryTime;
+
+            // Taxas de entrega
+            const deliveryFeesContainer = document.getElementById('delivery-fees');
+            deliveryFeesContainer.innerHTML = data.deliveryFees.map(fee => `
+        <div style="display: flex; justify-content: space-between; padding: var(--spacing-xs) 0;">
+          <span>${fee.neighborhood}</span>
+          <strong style="color: var(--primary);">${app.formatPrice(fee.fee)}</strong>
+        </div>
+      `).join('');
+
+            // Links sociais
+            const whatsappLink = `https://wa.me/${data.config.whatsappNumber}`;
+            document.getElementById('whatsapp-link').href = whatsappLink;
+            document.getElementById('instagram-link').href = `https://instagram.com/${data.storeInfo.instagram.replace('@', '')}`;
+
+            // Atualiza footer
+            document.getElementById('footer-hours-weekdays').textContent = data.storeInfo.hours.weekdays;
+            document.getElementById('footer-hours-sunday').textContent = data.storeInfo.hours.sunday;
+            document.getElementById('footer-address').textContent = data.storeInfo.address;
+            document.getElementById('footer-address-complement').textContent = data.storeInfo.addressComplement;
+            document.getElementById('footer-whatsapp').href = whatsappLink;
+            document.getElementById('footer-instagram').href = `https://instagram.com/${data.storeInfo.instagram.replace('@', '')}`;
+        });
+    </script>
+</body>
+
+</html>

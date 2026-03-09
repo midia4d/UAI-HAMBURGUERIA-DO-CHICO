@@ -1,0 +1,22 @@
+{
+  "name": "Uai Pizzaria & Doceria",
+  "short_name": "Uai Pizzaria",
+  "description": "Pizzas artesanais e doces deliciosos. Delivery e retirada no local.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8F0",
+  "theme_color": "#E63946",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "images/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

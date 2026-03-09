@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreio do Pedido — Uai Pizzaria</title>
+    <meta name="description" content="Acompanhe seu pedido em tempo real">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #E63946;
+            --primary-dk: #c1121f;
+            --green: #10B981;
+            --green-lt: #D1FAE5;
+            --orange: #F59E0B;
+            --orange-lt: #FEF3C7;
+            --blue: #3B82F6;
+            --blue-lt: #EFF6FF;
+            --gray: #6B7280;
+            --gray-lt: #F3F4F6;
+            --dark: #111827;
+            --white: #FFFFFF;
+            --radius: 14px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
+        /* ── Header ── */
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .refresh-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .refresh-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.4;
+                transform: scale(0.7);
+            }
+        }
+
+        /* ── Main ── */
+        .main {
+            max-width: 560px;
+            margin: 0 auto;
+            padding: 32px 16px 80px;
+        }
+
+        /* ── Card base ── */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 16px;
+        }
+
+        /* ── Order header ── */
+        .order-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .order-id {
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .order-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .order-date {
+            font-size: 0.82rem;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+
+        /* ── Status Banner (cancelado) ── */
+        .status-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .status-banner.cancelled {
+            background: #FEE2E2;
+            color: #B91C1C;
+            border: 2px solid #FECACA;
+        }
+
+        .status-banner.completed {
+            background: var(--green-lt);
+            color: #065F46;
+            border: 2px solid #6EE7B7;
+        }
+
+        /* ── Stepper ── */
+        .stepper {
+            position: relative;
+            padding-left: 56px;
+        }
+
+        .stepper-item {
+            position: relative;
+            padding-bottom: 36px;
+        }
+
+        .stepper-item:last-child {
+            padding-bottom: 0;
+        }
+
+        /* Linha conectora */
+        .stepper-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 40px;
+            bottom: 0;
+            width: 3px;
+            background: #E5E7EB;
+            border-radius: 3px;
+        }
+
+        .stepper-item:last-child::before {
+            display: none;
+        }
+
+        .stepper-item.done::before {
+            background: var(--green);
+        }
+
+        .stepper-item.active::before {
+            background: linear-gradient(to bottom, var(--primary), #E5E7EB);
+        }
+
+        /* Ícone */
+        .stepper-icon {
+            position: absolute;
+            left: -56px;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 700;
+            transition: all 0.4s ease;
+        }
+
+        .stepper-item.done .stepper-icon {
+            background: var(--green);
+            color: var(--white);
+            box-shadow: 0 0 0 4px var(--green-lt);
+        }
+
+        .stepper-item.active .stepper-icon {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.2);
+            animation: pulse-icon 1.8s infinite;
+        }
+
+        .stepper-item.pending .stepper-icon {
+            background: #F3F4F6;
+            color: #D1D5DB;
+            border: 2px solid #E5E7EB;
+        }
+
+        @keyframes pulse-icon {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 4px rgba(230, 57, 70, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(230, 57, 70, 0.08);
+            }
+        }
+
+        /* Texto */
+        .stepper-label {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 2px;
+        }
+
+        .stepper-item.pending .stepper-label {
+            color: #9CA3AF;
+        }
+
+        .stepper-desc {
+            font-size: 0.82rem;
+            color: var(--gray);
+            line-height: 1.5;
+        }
+
+        .stepper-time {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* ── Detalhes do pedido ── */
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--gray);
+            margin-bottom: 14px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #F3F4F6;
+            font-size: 0.9rem;
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-qty {
+            background: var(--gray-lt);
+            color: var(--gray);
+            font-weight: 700;
+            font-size: 0.78rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-right: 8px;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            padding: 5px 0;
+            color: var(--gray);
+        }
+
+        .totals-row.total {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--dark);
+            border-top: 2px solid #F3F4F6;
+            margin-top: 6px;
+            padding-top: 12px;
+        }
+
+        /* ── Endereço ── */
+        .address-box {
+            background: var(--blue-lt);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            font-size: 0.88rem;
+            color: #1E40AF;
+        }
+
+        .address-box i {
+            margin-top: 2px;
+        }
+
+        /* ── WhatsApp btn ── */
+        .btn-whatsapp {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 14px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-whatsapp:hover {
+            background: #1ebe57;
+            transform: translateY(-1px);
+        }
+
+        /* ── Loading / Error ── */
+        .center-screen {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--white);
+            gap: 16px;
+        }
+
+        .center-screen i {
+            font-size: 3rem;
+            opacity: 0.6;
+        }
+
+        .center-screen h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .center-screen p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: var(--white);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <a href="index.html" class="logo">
+            <div class="logo-icon"><i class="fa-solid fa-pizza-slice"></i></div>
+            <span>Uai Pizzaria</span>
+        </a>
+        <div class="refresh-badge">
+            <div class="refresh-dot"></div>
+            <span id="refresh-label">Atualizando...</span>
+        </div>
+    </header>
+
+    <!-- Conteúdo principal -->
+    <main class="main" id="main-content">
+        <div class="center-screen">
+            <div class="spinner"></div>
+            <h2>Carregando seu pedido...</h2>
+            <p>Aguarde um instante</p>
+        </div>
+    </main>
+
+    <!-- Scripts Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/rastreio.js"></script>
+</body>
+
+</html>

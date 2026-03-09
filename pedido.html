@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Faça seu pedido na Uai Pizzaria & Doceria - Delivery ou retirada no local">
+    <meta name="theme-color" content="#E63946">
+
+    <title>Fazer Pedido - Uai Pizzaria & Doceria</title>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        .page-header {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: calc(70px + var(--spacing-xl)) var(--spacing-md) var(--spacing-xl);
+            text-align: center;
+        }
+
+        .order-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-xl);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            background: var(--cream);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .cart-item-info h4 {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .cart-item-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            background: var(--primary);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 1.125rem;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .quantity {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .remove-btn {
+            padding: var(--spacing-xs);
+            font-size: 1.25rem;
+            opacity: 0.6;
+            transition: opacity var(--transition-base);
+        }
+
+        .remove-btn:hover {
+            opacity: 1;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: var(--spacing-sm);
+            font-size: 1rem;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-base);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+        }
+
+        .delivery-options {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .delivery-option {
+            flex: 1;
+            padding: var(--spacing-md);
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-align: center;
+        }
+
+        .delivery-option input[type="radio"] {
+            display: none;
+        }
+
+        .delivery-option:has(input:checked) {
+            border-color: var(--primary);
+            background: rgba(230, 57, 70, 0.05);
+        }
+
+        .delivery-option-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            padding-top: var(--spacing-md);
+        }
+
+        .banner {
+            background: var(--gradient-warm);
+            color: var(--white);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        @media (max-width: 968px) {
+            .order-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <span class="logo-icon">🍕</span>
+                <span>Uai Pizzaria</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="cardapio.html" class="nav-link">Cardápio</a></li>
+                <li><a href="pedido.html" class="nav-link">Fazer Pedido</a></li>
+                <li><a href="info.html" class="nav-link">Informações</a></li>
+            </ul>
+
+            <button class="menu-toggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Fazer Pedido</h1>
+        <p>Monte seu pedido e finalize pelo WhatsApp</p>
+    </div>
+
+    <!-- Main Content -->
+    <section class="section">
+        <div class="container">
+            <div class="order-container">
+                <!-- Formulário -->
+                <div>
+                    <div class="card">
+                        <h2>📋 Seus Dados</h2>
+
+                        <div class="form-group">
+                            <label class="form-label" for="customer-name">Nome *</label>
+                            <input type="text" id="customer-name" class="form-input" placeholder="Seu nome completo"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="customer-phone">Telefone *</label>
+                            <input type="tel" id="customer-phone" class="form-input" placeholder="(31) 99999-9999"
+                                required>
+                        </div>
+                    </div>
+
+                    <div class="card mt-2">
+                        <h2><i class="fa-solid fa-truck"></i> Tipo de Entrega</h2>
+
+                        <div class="delivery-options">
+                            <label class="delivery-option">
+                                <input type="radio" name="delivery-type" value="delivery" checked>
+                                <div class="delivery-option-icon"><i class="fa-solid fa-motorcycle"></i></div>
+                                <div><strong>Delivery</strong></div>
+                                <div style="font-size: 0.875rem; color: var(--gray);">Entregamos em 45-60 min</div>
+                            </label>
+
+                            <label class="delivery-option">
+                                <input type="radio" name="delivery-type" value="pickup">
+                                <div class="delivery-option-icon"><i class="fa-solid fa-store"></i></div>
+                                <div><strong>Retirada</strong></div>
+                                <div style="font-size: 0.875rem; color: var(--gray);">Retire no local</div>
+                            </label>
+                        </div>
+
+                        <!-- Seção de Delivery -->
+                        <div id="delivery-section">
+
+                            <!-- Campo: Endereço (rua e número) -->
+                            <div class="form-group">
+                                <label class="form-label" for="address">
+                                    <i class="fa-solid fa-road"></i> Rua e Número *
+                                </label>
+                                <input type="text" id="address" class="form-input"
+                                    placeholder="Ex: Rua Cora Coralina, 179" required>
+                            </div>
+
+                            <!-- Campo: Bairro (select com taxa visível) -->
+                            <div class="form-group">
+                                <label class="form-label" for="neighborhood">
+                                    <i class="fa-solid fa-location-dot"></i> Bairro *
+                                </label>
+                                <select id="neighborhood" class="form-select" required
+                                    onchange="orderSystem.onNeighborhoodChange(this)">
+                                    <option value="">Selecione seu bairro...</option>
+                                    <!-- preenchido via JS -->
+                                </select>
+                            </div>
+
+                            <!-- Card de taxa (aparece após selecionar bairro) -->
+                            <div id="delivery-fee-card" class="delivery-fee-card hidden">
+                                <div class="delivery-fee-info">
+                                    <div>
+                                        <div class="delivery-fee-label">Bairro</div>
+                                        <div class="delivery-fee-neighborhood" id="selected-neighborhood-name">--</div>
+                                    </div>
+                                    <div style="text-align:right;">
+                                        <div class="delivery-fee-label">Taxa de entrega</div>
+                                        <div class="delivery-fee-value" id="selected-fee-value">--</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campo: Complemento -->
+                            <div class="form-group">
+                                <label class="form-label" for="address-complement">Complemento</label>
+                                <input type="text" id="address-complement" class="form-input"
+                                    placeholder="Apartamento, bloco, referência...">
+                            </div>
+
+                            <p style="color: var(--gray); font-size: 0.875rem;">
+                                <i class="fa-solid fa-clock"></i> Tempo estimado: <strong>45 a 60 minutos</strong>
+                            </p>
+                        </div>
+
+                        <!-- Seção de Retirada -->
+                        <div id="pickup-section" class="hidden">
+                            <div class="banner" style="background: var(--light-gray); color: var(--dark);">
+                                <i class="fa-solid fa-location-dot"></i> Retire seu pedido em:<br>
+                                <strong id="pickup-address"></strong><br>
+                                <span id="pickup-complement" style="font-size: 0.875rem;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Forma de Pagamento -->
+                    <div class="card mt-2">
+                        <h2><i class="fa-solid fa-credit-card"></i> Forma de Pagamento</h2>
+
+                        <div class="payment-options">
+
+                            <label class="payment-option" id="pay-dinheiro">
+                                <input type="radio" name="payment-method" value="dinheiro"
+                                    onchange="orderSystem.onPaymentChange(this)">
+                                <div class="payment-option-content">
+                                    <i class="fa-solid fa-money-bill-wave payment-icon" style="color:#10B981;"></i>
+                                    <span class="payment-label">Dinheiro</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-option" id="pay-pix">
+                                <input type="radio" name="payment-method" value="pix"
+                                    onchange="orderSystem.onPaymentChange(this)">
+                                <div class="payment-option-content">
+                                    <i class="fa-brands fa-pix payment-icon" style="color:#32bcad;"></i>
+                                    <span class="payment-label">PIX</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-option" id="pay-credito">
+                                <input type="radio" name="payment-method" value="credito"
+                                    onchange="orderSystem.onPaymentChange(this)">
+                                <div class="payment-option-content">
+                                    <i class="fa-regular fa-credit-card payment-icon" style="color:#3B82F6;"></i>
+                                    <span class="payment-label">Crédito</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-option" id="pay-debito">
+                                <input type="radio" name="payment-method" value="debito"
+                                    onchange="orderSystem.onPaymentChange(this)">
+                                <div class="payment-option-content">
+                                    <i class="fa-solid fa-credit-card payment-icon" style="color:#6366F1;"></i>
+                                    <span class="payment-label">Débito</span>
+                                </div>
+                            </label>
+
+                        </div>
+
+                        <!-- Campo de troco (só aparece quando Dinheiro) -->
+                        <div id="troco-section" class="hidden" style="margin-top:16px;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label class="form-label" for="troco-valor">
+                                    <i class="fa-solid fa-coins"></i> Troco para quanto?
+                                </label>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <input type="number" id="troco-valor" class="form-input" placeholder="Ex: 50,00"
+                                        min="0" step="0.01" style="max-width:160px;">
+                                    <span style="color:var(--gray); font-size:0.85rem;">
+                                        (deixe em branco se não precisar de troco)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informação do PIX (só aparece quando PIX) -->
+                        <div id="pix-section" class="hidden" style="margin-top:16px;">
+                            <div
+                                style="background:#E6FBF8; border:2px solid #32bcad; border-radius:10px; padding:14px 16px;">
+                                <div style="font-weight:700; color:#0E7490; margin-bottom:6px;">
+                                    <i class="fa-brands fa-pix"></i> Chave PIX da Loja
+                                </div>
+                                <div id="pix-key-display"
+                                    style="font-size:1.05rem; font-weight:600; color:#0E7490; letter-spacing:0.03em;">
+                                    Carregando...
+                                </div>
+                                <div style="font-size:0.8rem; color:#0E7490; margin-top:6px; opacity:0.8;">
+                                    Realize o pagamento antes da entrega e informe o comprovante ao entregador.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Cupom de Desconto -->
+                    <div class="card mt-2">
+                        <h2><i class="fa-solid fa-tag"></i> Cupom de Desconto</h2>
+
+                        <!-- Input do cupom -->
+                        <div id="coupon-input-area">
+                            <div class="coupon-input-row">
+                                <input type="text" id="coupon-code" class="form-input coupon-field"
+                                    placeholder="Digite seu cupom (ex: PROMO10)"
+                                    style="text-transform:uppercase; letter-spacing:.05em;">
+                                <button class="btn btn-coupon-apply" onclick="orderSystem.applyCoupon()">
+                                    Aplicar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cupom aplicado (hidden por padrão) -->
+                        <div id="coupon-applied" class="hidden">
+                            <div class="coupon-applied-card">
+                                <div class="coupon-applied-info">
+                                    <i class="fa-solid fa-circle-check" style="color:#10B981; font-size:1.2rem;"></i>
+                                    <div>
+                                        <div class="coupon-applied-code" id="coupon-applied-code">PROMO10</div>
+                                        <div class="coupon-applied-desc" id="coupon-applied-desc">10% de desconto</div>
+                                    </div>
+                                </div>
+                                <button class="coupon-remove-btn" onclick="orderSystem.removeCoupon()"
+                                    title="Remover cupom">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="text-center mt-2">
+                        <a href="cardapio.html" class="btn btn-secondary">
+                            ← Voltar ao Cardápio
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Resumo do Pedido -->
+                <div>
+                    <div class="card" style="position: sticky; top: 90px;">
+                        <h2><i class="fa-solid fa-cart-shopping"></i> Seu Pedido</h2>
+
+                        <div id="cart-empty" class="text-center" style="padding: var(--spacing-xl) 0;">
+                            <div
+                                style="font-size: 4rem; margin-bottom: var(--spacing-sm); color: var(--gray); opacity:.4;">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                            </div>
+                            <p style="color: var(--gray);">Seu carrinho está vazio</p>
+                            <a href="cardapio.html" class="btn btn-primary mt-1">
+                                Ver Cardápio
+                            </a>
+                        </div>
+
+                        <div id="cart-summary" class="hidden">
+                            <div id="cart-items" style="margin-bottom: var(--spacing-md);">
+                                <!-- Itens do carrinho -->
+                            </div>
+
+                            <div id="free-delivery-banner" class="banner hidden">
+                                <i class="fa-solid fa-truck"></i> Entrega GRÁTIS!
+                            </div>
+
+                            <div style="border-top: 2px solid var(--light-gray); padding-top: var(--spacing-md);">
+                                <div class="summary-row">
+                                    <span>Subtotal:</span>
+                                    <span id="subtotal-value">R$ 0,00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Taxa de entrega:</span>
+                                    <span id="delivery-fee-value">R$ 0,00</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>TOTAL:</span>
+                                    <span id="total-value">R$ 0,00</span>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary btn-large"
+                                style="width: 100%; margin-top: var(--spacing-md);" onclick="orderSystem.finishOrder()">
+                                <span class="btn-icon"><i class="fab fa-whatsapp"></i></span>
+                                Finalizar no WhatsApp
+                            </button>
+
+                            <button class="btn btn-secondary" style="width: 100%; margin-top: var(--spacing-sm);"
+                                onclick="orderSystem.clearCart()">
+                                Limpar Carrinho
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Uai Pizzaria & Doceria</h3>
+                    <p>Porque toda história de amor merece um bom começo</p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Horário de Funcionamento</h3>
+                    <p id="footer-hours-weekdays"></p>
+                    <p id="footer-hours-sunday"></p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Localização</h3>
+                    <p id="footer-address"></p>
+                    <p id="footer-address-complement"></p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <a href="#" id="footer-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a href="#" id="footer-instagram"><i class="fab fa-instagram"></i> Instagram</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Uai Pizzaria & Doceria. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="#" class="whatsapp-float" aria-label="WhatsApp">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M16 0C7.164 0 0 7.163 0 16c0 2.826.736 5.587 2.138 8.024L.07 31.765l8.026-2.052A15.93 15.93 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.455c-2.516 0-4.97-.702-7.095-2.03l-.51-.304-5.29 1.353 1.38-5.16-.334-.53A13.39 13.39 0 0 1 2.545 16c0-7.42 6.035-13.455 13.455-13.455S29.455 8.58 29.455 16 23.42 29.455 16 29.455z" />
+            <path
+                d="M23.14 19.47c-.39-.195-2.31-1.14-2.67-1.27-.36-.13-.62-.195-.88.195-.26.39-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.195-1.645-.606-3.133-1.933-1.158-1.033-1.94-2.31-2.168-2.7-.228-.39-.024-.6.17-.795.175-.175.39-.455.585-.683.195-.228.26-.39.39-.65.13-.26.065-.487-.033-.683-.098-.195-.88-2.12-1.205-2.9-.317-.76-.64-.657-.88-.67-.228-.013-.487-.016-.747-.016s-.683.098-1.04.487c-.357.39-1.363 1.333-1.363 3.25s1.396 3.77 1.59 4.03c.195.26 2.745 4.19 6.65 5.875.93.402 1.656.642 2.222.822.934.297 1.785.255 2.458.155.75-.112 2.31-.944 2.635-1.856.325-.912.325-1.694.228-1.856-.098-.162-.358-.26-.748-.455z" />
+        </svg>
+    </a>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js?v=3"></script>
+
+    <!-- Scripts -->
+    <script src="js/data.js?v=3"></script>
+    <script src="js/main.js?v=3"></script>
+    <script src="js/order.js?v=3"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = getData();
+
+            // Atualiza endereço de retirada
+            document.getElementById('pickup-address').textContent = data.storeInfo.address;
+            document.getElementById('pickup-complement').textContent = data.storeInfo.addressComplement;
+
+            // Atualiza footer
+            document.getElementById('footer-hours-weekdays').textContent = data.storeInfo.hours.weekdays;
+            document.getElementById('footer-hours-sunday').textContent = data.storeInfo.hours.sunday;
+            document.getElementById('footer-address').textContent = data.storeInfo.address;
+            document.getElementById('footer-address-complement').textContent = data.storeInfo.addressComplement;
+
+            const whatsappLink = `https://wa.me/${data.config.whatsappNumber}`;
+            document.getElementById('footer-whatsapp').href = whatsappLink;
+            document.getElementById('footer-instagram').href = `https://instagram.com/${data.storeInfo.instagram.replace('@', '')}`;
+        });
+    </script>
+</body>
+
+</html>

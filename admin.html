@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Painel Admin - Uai Pizzaria & Doceria</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-modal.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fa-solid fa-utensils"></i> Painel Administrativo</h1>
+            <p>Uai Pizzaria & Doceria</p>
+            <button id="logout-btn" class="btn btn-secondary" style="margin-top: var(--spacing-md);">
+                <i class="fa-solid fa-right-from-bracket"></i> Sair
+            </button>
+        </div>
+
+        <!-- Navegação -->
+        <div class="admin-nav">
+            <button class="admin-nav-btn active" data-section="dashboard"><i class="fa-solid fa-gauge"></i>
+                Dashboard</button>
+            <button class="admin-nav-btn" data-section="orders" id="orders-nav-btn"><i class="fa-solid fa-receipt"></i>
+                Pedidos <span id="orders-badge" class="orders-badge hidden">0</span></button>
+            <button class="admin-nav-btn" data-section="reports"><i class="fa-solid fa-chart-line"></i>
+                Relatórios</button>
+            <button class="admin-nav-btn" data-section="history"><i class="fa-solid fa-clock-rotate-left"></i>
+                Histórico</button>
+            <button class="admin-nav-btn" data-section="products"><i class="fa-solid fa-box"></i> Produtos</button>
+            <button class="admin-nav-btn" data-section="delivery"><i class="fa-solid fa-truck"></i> Taxas de
+                Entrega</button>
+            <button class="admin-nav-btn" data-section="coupons"><i class="fa-solid fa-tag"></i> Cupons</button>
+            <button class="admin-nav-btn" data-section="settings"><i class="fa-solid fa-gear"></i>
+                Configurações</button>
+            <button class="admin-nav-btn" data-section="backup"><i class="fa-solid fa-database"></i> Backup</button>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="admin-section active">
+            <div class="admin-card">
+                <h2>Visão Geral</h2>
+                <div class="grid grid-4">
+                    <div class="card text-center">
+                        <div class="dashboard-icon" style="color:#2563EB;"><i class="fa-solid fa-box"></i></div>
+                        <h3 id="total-products">0</h3>
+                        <p>Total de Produtos</p>
+                    </div>
+                    <div class="card text-center">
+                        <div class="dashboard-icon" style="color:#10B981;"><i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <h3 id="active-products">0</h3>
+                        <p>Produtos Ativos</p>
+                    </div>
+                    <div class="card text-center">
+                        <div class="dashboard-icon" style="color:#8B5CF6;"><i class="fa-solid fa-folder-open"></i></div>
+                        <h3 id="total-categories">0</h3>
+                        <p>Categorias</p>
+                    </div>
+                    <div class="card text-center">
+                        <div class="dashboard-icon" style="color:#F59E0B;"><i class="fa-solid fa-globe"></i></div>
+                        <h3 id="site-status">-</h3>
+                        <p>Status do Site</p>
+                    </div>
+                    <div class="card text-center" style="cursor:pointer;" onclick="adminSystem.showSection('orders')">
+                        <div class="dashboard-icon" style="color:#EF4444;"><i class="fa-solid fa-bell"></i></div>
+                        <h3 id="pending-orders-count">0</h3>
+                        <p>Pedidos Pendentes</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h2>Ações Rápidas</h2>
+                <div class="grid grid-3">
+                    <button class="btn btn-primary" onclick="adminSystem.showSection('orders')">
+                        <i class="fa-solid fa-receipt"></i> Ver Pedidos
+                    </button>
+                    <button class="btn btn-primary" onclick="adminSystem.showSection('products')">
+                        <i class="fa-solid fa-box"></i> Gerenciar Produtos
+                    </button>
+                    <button class="btn btn-primary" onclick="adminSystem.showSection('settings')">
+                        <i class="fa-solid fa-gear"></i> Configurações Gerais
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pedidos -->
+        <div id="orders" class="admin-section">
+            <div class="admin-card">
+                <div class="orders-header">
+                    <h2><i class="fa-solid fa-receipt"></i> Pedidos em Tempo Real</h2>
+                    <div class="realtime-indicator" id="realtime-status">
+                        <span class="realtime-dot"></span> Conectando...
+                    </div>
+                </div>
+
+                <!-- Filtros de status -->
+                <div class="orders-filters">
+                    <button class="order-filter-btn active" data-filter="all"
+                        onclick="adminSystem.filterOrders('all')">Todos</button>
+                    <button class="order-filter-btn" data-filter="pending"
+                        onclick="adminSystem.filterOrders('pending')"><i class="fa-solid fa-clock"></i>
+                        Pendentes</button>
+                    <button class="order-filter-btn" data-filter="preparing"
+                        onclick="adminSystem.filterOrders('preparing')"><i class="fa-solid fa-fire-burner"></i> Em
+                        Preparo</button>
+                    <button class="order-filter-btn" data-filter="delivering"
+                        onclick="adminSystem.filterOrders('delivering')"><i class="fa-solid fa-motorcycle"></i> Saiu p/
+                        Entrega</button>
+                    <button class="order-filter-btn" data-filter="completed"
+                        onclick="adminSystem.filterOrders('completed')"><i class="fa-solid fa-circle-check"></i>
+                        Entregue</button>
+                    <button class="order-filter-btn" data-filter="cancelled"
+                        onclick="adminSystem.filterOrders('cancelled')"><i class="fa-solid fa-circle-xmark"></i>
+                        Cancelado</button>
+                </div>
+
+                <div class="orders-toolbar">
+                    <button class="btn btn-secondary btn-small" onclick="adminSystem.loadOrders()"><i
+                            class="fa-solid fa-rotate"></i> Atualizar</button>
+                    <span id="orders-count-label" style="color: var(--gray); font-size: 0.9rem;"></span>
+                </div>
+
+                <div id="orders-list">
+                    <div class="orders-empty">
+                        <div class="orders-empty-icon"><i class="fa-solid fa-receipt"></i></div>
+                        <p>Nenhum pedido ainda</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios -->
+        <div id="reports" class="admin-section">
+            <div class="admin-card">
+                <div class="orders-header">
+                    <h2><i class="fa-solid fa-chart-line"></i> Relatórios</h2>
+                    <div class="period-selector">
+                        <button class="period-btn active" data-days="7" onclick="adminSystem.loadReports(7)">7
+                            dias</button>
+                        <button class="period-btn" data-days="30" onclick="adminSystem.loadReports(30)">30 dias</button>
+                        <button class="period-btn" data-days="0" onclick="adminSystem.loadReports(0)">Este mês</button>
+                    </div>
+                </div>
+
+                <!-- KPIs -->
+                <div class="report-kpi-grid" id="report-kpis">
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="color:#2563EB;"><i class="fa-solid fa-receipt"></i></div>
+                        <div class="kpi-value" id="kpi-total-orders">--</div>
+                        <div class="kpi-label">Total de Pedidos</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="color:#10B981;"><i class="fa-solid fa-dollar-sign"></i></div>
+                        <div class="kpi-value" id="kpi-revenue">--</div>
+                        <div class="kpi-label">Faturamento</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="color:#8B5CF6;"><i class="fa-solid fa-tag"></i></div>
+                        <div class="kpi-value" id="kpi-avg-ticket">--</div>
+                        <div class="kpi-label">Ticket Médio</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="color:#F59E0B;"><i class="fa-solid fa-clock"></i></div>
+                        <div class="kpi-value" id="kpi-pending">--</div>
+                        <div class="kpi-label">Pedidos Pendentes</div>
+                    </div>
+                </div>
+
+                <!-- Gráficos -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3><i class="fa-solid fa-chart-bar"></i> Pedidos por Dia</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-orders"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fa-solid fa-chart-line"></i> Faturamento por Dia</h3>
+                        <div class="chart-container">
+                            <canvas id="chart-revenue"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status breakdown -->
+                <div class="charts-grid" style="margin-top: var(--spacing-lg);">
+                    <div class="chart-card">
+                        <h3><i class="fa-solid fa-chart-pie"></i> Pedidos por Status</h3>
+                        <div class="chart-container" style="max-height:260px;">
+                            <canvas id="chart-status"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3><i class="fa-solid fa-motorcycle"></i> Delivery vs Retirada</h3>
+                        <div class="chart-container" style="max-height:260px;">
+                            <canvas id="chart-delivery-type"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reports-loading" class="text-center" style="padding:2rem;display:none;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--primary);"></i>
+                    <p>Carregando relatório...</p>
+                </div>
+                <div id="reports-empty" class="orders-empty" style="display:none;">
+                    <div class="orders-empty-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <p>Nenhum pedido no período selecionado</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Histórico de Pedidos -->
+        <div id="history" class="admin-section">
+            <div class="admin-card">
+                <div class="orders-header">
+                    <h2><i class="fa-solid fa-clock-rotate-left"></i> Histórico de Pedidos</h2>
+                    <button class="btn btn-secondary btn-small" onclick="adminSystem.exportHistory()">
+                        <i class="fa-solid fa-file-csv"></i> Exportar CSV
+                    </button>
+                </div>
+
+                <!-- Filtros -->
+                <div class="history-filters">
+                    <div class="history-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="history-search" placeholder="Buscar por cliente ou telefone..."
+                            oninput="adminSystem.filterHistory()">
+                    </div>
+                    <div class="history-filter-group">
+                        <label>De:</label>
+                        <input type="date" id="history-date-from" onchange="adminSystem.filterHistory()">
+                    </div>
+                    <div class="history-filter-group">
+                        <label>Até:</label>
+                        <input type="date" id="history-date-to" onchange="adminSystem.filterHistory()">
+                    </div>
+                    <div class="history-filter-group">
+                        <label>Status:</label>
+                        <select id="history-status" onchange="adminSystem.filterHistory()">
+                            <option value="all">Todos</option>
+                            <option value="pending">Pendente</option>
+                            <option value="preparing">Em Preparo</option>
+                            <option value="delivering">Saiu p/ Entrega</option>
+                            <option value="completed">Entregue</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="adminSystem.clearHistoryFilters()">
+                        <i class="fa-solid fa-xmark"></i> Limpar
+                    </button>
+                </div>
+
+                <!-- Resumo rápido -->
+                <div id="history-summary" class="history-summary"></div>
+
+                <!-- Tabela -->
+                <div class="history-table-wrapper">
+                    <table class="table history-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Data / Hora</th>
+                                <th>Cliente</th>
+                                <th>Telefone</th>
+                                <th>Tipo</th>
+                                <th>Itens</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body">
+                            <!-- preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="history-empty" class="orders-empty" style="display:none;">
+                    <div class="orders-empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                    <p>Nenhum pedido encontrado com esses filtros</p>
+                </div>
+
+                <div id="history-count" class="history-count"></div>
+            </div>
+        </div>
+
+        <!-- Produtos -->
+        <div id="products" class="admin-section">
+            <div class="admin-card">
+                <h2>Gerenciar Produtos</h2>
+
+                <button class="btn btn-success" onclick="adminSystem.openProductModal()">
+                    <span style="font-size: 1.2rem;">+</span> Adicionar Novo Produto
+                </button>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Categoria</th>
+                            <th>Preço</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- Produtos carregados via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Taxas de Entrega -->
+        <div id="delivery" class="admin-section">
+            <div class="admin-card">
+                <h2>Taxas de Entrega por Bairro</h2>
+
+                <button class="btn btn-success" onclick="adminSystem.addDeliveryFee()">
+                    + Adicionar Bairro
+                </button>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Bairro</th>
+                            <th>Taxa</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="delivery-fees-table-body">
+                        <!-- Taxas carregadas via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============ SECTION: CUPONS ============ -->
+        <div id="coupons" class="admin-section">
+            <div class="admin-card">
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:var(--spacing-md);">
+                    <h2><i class="fa-solid fa-tag"></i> Cupons de Desconto</h2>
+                    <button class="btn btn-success" onclick="adminSystem.openCouponModal()">
+                        <i class="fa-solid fa-plus"></i> Novo Cupom
+                    </button>
+                </div>
+
+                <div id="coupons-table-wrapper" style="overflow-x:auto;">
+                    <table class="history-table" id="coupons-table" style="width:100%; border-collapse:collapse;">
+                        <thead>
+                            <tr style="background:var(--admin-bg);">
+                                <th style="padding:10px 12px; text-align:left;">Código</th>
+                                <th style="padding:10px 12px; text-align:left;">Tipo</th>
+                                <th style="padding:10px 12px; text-align:left;">Valor</th>
+                                <th style="padding:10px 12px; text-align:left;">Mín. Pedido</th>
+                                <th style="padding:10px 12px; text-align:left;">Usos</th>
+                                <th style="padding:10px 12px; text-align:left;">Status</th>
+                                <th style="padding:10px 12px; text-align:left;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coupons-tbody">
+                            <tr>
+                                <td colspan="7" style="text-align:center; padding:24px; color:var(--gray);">
+                                    Carregando...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configurações -->
+        <div id="settings" class="admin-section">
+            <div class="admin-card">
+                <h2>Configurações Gerais</h2>
+
+                <h3 style="margin-top: var(--spacing-lg);">Controles do Site</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Pausar Site</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="site-paused">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p style="font-size: 0.875rem; color: var(--gray); margin-top: var(--spacing-xs);">
+                            Quando pausado, o site mostra mensagem de fechado
+                        </p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Habilitar Pedidos</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="orders-enabled">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p style="font-size: 0.875rem; color: var(--gray); margin-top: var(--spacing-xs);">
+                            Permite que clientes façam pedidos
+                        </p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: var(--spacing-lg);">WhatsApp e Delivery</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Número do WhatsApp</label>
+                        <input type="text" id="whatsapp-number" class="form-input" placeholder="5531999999999">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Valor Mínimo para Entrega Grátis (R$)</label>
+                        <input type="number" id="free-delivery-min" class="form-input" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tempo Estimado de Entrega</label>
+                    <input type="text" id="delivery-time" class="form-input" placeholder="45 a 60 minutos">
+                </div>
+
+                <h3 style="margin-top: var(--spacing-lg);">Mensagens do Site</h3>
+                <div class="form-group">
+                    <label class="form-label">Mensagem de Boas-Vindas</label>
+                    <input type="text" id="welcome-message" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Frase de Destaque</label>
+                    <input type="text" id="tagline" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Banner de Entrega Grátis</label>
+                    <input type="text" id="delivery-banner" class="form-input">
+                </div>
+
+                <h3 style="margin-top: var(--spacing-lg);">Informações da Loja</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Telefone</label>
+                        <input type="text" id="store-phone" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Instagram</label>
+                        <input type="text" id="store-instagram" class="form-input" placeholder="@uaipizzaria">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Endereço</label>
+                    <input type="text" id="store-address" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Complemento do Endereço</label>
+                    <input type="text" id="store-complement" class="form-input">
+                </div>
+
+                <h3 style="margin-top: var(--spacing-lg);">Segurança</h3>
+                <div class="form-group">
+                    <label class="form-label">Senha do Admin</label>
+                    <input type="password" id="admin-password-input" class="form-input">
+                    <p style="font-size: 0.875rem; color: var(--gray); margin-top: var(--spacing-xs);">
+                        Altere a senha padrão para maior segurança
+                    </p>
+                </div>
+
+                <button class="btn btn-success btn-large" onclick="adminSystem.saveSettings()">
+                    Salvar Todas as Configurações
+                </button>
+            </div>
+        </div>
+
+        <!-- Backup -->
+        <div id="backup" class="admin-section">
+            <div class="admin-card">
+                <h2>Backup e Restauração</h2>
+
+                <div class="alert alert-warning">
+                    <strong>⚠️ Importante:</strong> Faça backup regularmente dos seus dados. O backup salva todos os
+                    produtos, categorias, configurações e taxas de entrega.
+                </div>
+
+                <h3>Exportar Dados</h3>
+                <p>Baixe um arquivo JSON com todos os dados do sistema.</p>
+                <button class="btn btn-success" onclick="adminSystem.exportData()">
+                    📥 Exportar Backup
+                </button>
+
+                <h3 style="margin-top: var(--spacing-xl);">Importar Dados</h3>
+                <p>Restaure dados de um backup anterior.</p>
+                <input type="file" id="import-file" accept=".json" style="display: none;"
+                    onchange="adminSystem.importData(this.files[0])">
+                <button class="btn btn-warning" onclick="document.getElementById('import-file').click()">
+                    📤 Importar Backup
+                </button>
+
+                <div class="alert alert-danger" style="margin-top: var(--spacing-lg);">
+                    <strong>⚠️ Atenção:</strong> Importar um backup substituirá TODOS os dados atuais. Esta ação não
+                    pode ser desfeita!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Produto -->
+    <div id="product-modal" class="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>
+                    <span id="modal-icon">🍕</span>
+                    <span id="modal-title">Adicionar Produto</span>
+                </h2>
+                <button class="modal-close" onclick="adminSystem.closeProductModal()">×</button>
+            </div>
+
+            <form id="product-form" onsubmit="event.preventDefault(); adminSystem.saveProduct();">
+                <div class="modal-body">
+                    <input type="hidden" id="product-id">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Nome do Produto <span class="required">*</span>
+                            </label>
+                            <input type="text" id="product-name" class="form-input" placeholder="Ex: Pizza Margherita"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Categoria <span class="required">*</span>
+                            </label>
+                            <select id="product-category" class="form-select" required>
+                                <option value="">Selecione...</option>
+                                <option value="pizzas">🍕 Pizzas</option>
+                                <option value="doces">🍰 Doces</option>
+                                <option value="bebidas">🥤 Bebidas</option>
+                                <option value="salgados">🥐 Salgados</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            Descrição <span class="required">*</span>
+                        </label>
+                        <textarea id="product-description" class="form-textarea"
+                            placeholder="Descreva os ingredientes e características do produto..." required></textarea>
+                        <div class="form-hint">Seja descritivo para atrair mais clientes!</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                Preço (R$) <span class="required">*</span>
+                            </label>
+                            <input type="number" id="product-price" class="form-input" step="0.01" min="0"
+                                placeholder="0.00" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Status
+                            </label>
+                            <select id="product-available" class="form-select">
+                                <option value="true">✅ Disponível</option>
+                                <option value="false">❌ Indisponível</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            URL da Imagem (opcional)
+                        </label>
+                        <input type="url" id="product-image" class="form-input"
+                            placeholder="https://exemplo.com/imagem.jpg">
+                        <div class="form-hint">Cole o link de uma imagem do produto</div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="adminSystem.closeProductModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        <span id="modal-submit-text">Adicionar Produto</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin.js"></script>
+
+    <!-- Modal de Cupom -->
+    <div id="coupon-modal" class="modal-overlay hidden">
+        <div class="modal-container" style="max-width:480px;">
+            <div class="modal-header">
+                <h3 id="coupon-modal-title"><i class="fa-solid fa-tag"></i> Novo Cupom</h3>
+                <button class="modal-close" onclick="adminSystem.closeCouponModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="coupon-form" onsubmit="adminSystem.saveCoupon(event)">
+                <div class="modal-body">
+
+                    <input type="hidden" id="coupon-edit-id">
+
+                    <div class="form-group">
+                        <label class="form-label">Código do Cupom *</label>
+                        <input type="text" id="coupon-form-code" class="form-input" placeholder="Ex: PROMO10" required
+                            style="text-transform:uppercase; font-weight:700; letter-spacing:.05em;">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Desconto *</label>
+                        <select id="coupon-form-type" class="form-input" onchange="adminSystem.onCouponTypeChange()"
+                            required>
+                            <option value="percent">Percentual (ex: 10%)</option>
+                            <option value="fixed">Valor Fixo (ex: R$5,00)</option>
+                            <option value="free_shipping">Frete Gratis</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="coupon-value-group">
+                        <label class="form-label" id="coupon-value-label">Valor (%) *</label>
+                        <input type="number" id="coupon-form-value" class="form-input" placeholder="10" min="0"
+                            step="0.01">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Pedido Mínimo (R$)</label>
+                        <input type="number" id="coupon-form-min" class="form-input" placeholder="0" min="0" step="0.01"
+                            value="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Limite de Usos</label>
+                        <input type="number" id="coupon-form-limit" class="form-input" placeholder="Sem limite" min="1"
+                            step="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descrição (opcional)</label>
+                        <input type="text" id="coupon-form-desc" class="form-input"
+                            placeholder="Ex: 10% de desconto em pizzas">
+                    </div>
+
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" id="coupon-form-active" checked
+                            style="width:18px; height:18px; cursor:pointer;">
+                        <label for="coupon-form-active" class="form-label" style="margin:0; cursor:pointer;">Cupom
+                            ativo</label>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="adminSystem.closeCouponModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="coupon-submit-btn">Salvar Cupom</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+
+</html>

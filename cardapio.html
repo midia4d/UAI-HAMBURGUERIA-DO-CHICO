@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Cardápio completo da Uai Pizzaria & Doceria - Pizzas, doces, bebidas e muito mais!">
+    <meta name="theme-color" content="#E63946">
+
+    <title>Cardápio - Uai Pizzaria & Doceria</title>
+
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/toast.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-header {
+            background: var(--gradient-primary);
+            color: var(--white);
+            padding: calc(70px + var(--spacing-xl)) var(--spacing-md) var(--spacing-xl);
+            text-align: center;
+        }
+
+        .category-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            overflow-x: auto;
+            padding: var(--spacing-md) 0;
+            margin-bottom: var(--spacing-lg);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .category-tab {
+            flex-shrink: 0;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--white);
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .category-tab:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .category-tab.active {
+            background: var(--gradient-primary);
+            color: var(--white);
+            border-color: transparent;
+        }
+
+        .search-box {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--spacing-md);
+            font-size: 1rem;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-md);
+            transition: all var(--transition-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+        }
+
+        .category-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-sm);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .category-icon {
+            font-size: 2.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">
+                <span class="logo-icon"><i class="fa-solid fa-pizza-slice"></i></span>
+                <span>Uai Pizzaria</span>
+            </a>
+
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="cardapio.html" class="nav-link">Cardápio</a></li>
+                <li><a href="pedido.html" class="nav-link">Fazer Pedido</a></li>
+                <li><a href="info.html" class="nav-link">Informações</a></li>
+            </ul>
+
+            <button class="menu-toggle" aria-label="Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Nosso Cardápio</h1>
+        <p>Explore nossos deliciosos produtos</p>
+    </div>
+
+    <!-- Main Content -->
+    <section class="section">
+        <div class="container">
+            <!-- Search -->
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar produtos..."
+                    autocomplete="off">
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="category-tabs" id="category-tabs">
+                <!-- Tabs serão carregadas via JavaScript -->
+            </div>
+
+            <!-- Products by Category -->
+            <div id="menu-content">
+                <!-- Conteúdo será carregado via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Uai Pizzaria & Doceria</h3>
+                    <p>Porque toda história de amor merece um bom começo</p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Horário de Funcionamento</h3>
+                    <p id="footer-hours-weekdays"></p>
+                    <p id="footer-hours-sunday"></p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Localização</h3>
+                    <p id="footer-address"></p>
+                    <p id="footer-address-complement"></p>
+                </div>
+
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <a href="#" id="footer-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    <a href="#" id="footer-instagram"><i class="fab fa-instagram"></i> Instagram</a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Uai Pizzaria & Doceria. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="#" class="whatsapp-float" aria-label="WhatsApp">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path
+                d="M16 0C7.164 0 0 7.163 0 16c0 2.826.736 5.587 2.138 8.024L.07 31.765l8.026-2.052A15.93 15.93 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.455c-2.516 0-4.97-.702-7.095-2.03l-.51-.304-5.29 1.353 1.38-5.16-.334-.53A13.39 13.39 0 0 1 2.545 16c0-7.42 6.035-13.455 13.455-13.455S29.455 8.58 29.455 16 23.42 29.455 16 29.455z" />
+            <path
+                d="M23.14 19.47c-.39-.195-2.31-1.14-2.67-1.27-.36-.13-.62-.195-.88.195-.26.39-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.195-1.645-.606-3.133-1.933-1.158-1.033-1.94-2.31-2.168-2.7-.228-.39-.024-.6.17-.795.175-.175.39-.455.585-.683.195-.228.26-.39.39-.65.13-.26.065-.487-.033-.683-.098-.195-.88-2.12-1.205-2.9-.317-.76-.64-.657-.88-.67-.228-.013-.487-.016-.747-.016s-.683.098-1.04.487c-.357.39-1.363 1.333-1.363 3.25s1.396 3.77 1.59 4.03c.195.26 2.745 4.19 6.65 5.875.93.402 1.656.642 2.222.822.934.297 1.785.255 2.458.155.75-.112 2.31-.944 2.635-1.856.325-.912.325-1.694.228-1.856-.098-.162-.358-.26-.748-.455z" />
+        </svg>
+    </a>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Aguardar carregamento dos dados do Supabase
+        window.addEventListener('dataLoaded', (event) => {
+            const data = event.detail || getData();
+            let currentCategory = 'all';
+            let searchQuery = '';
+
+            // Renderiza tabs de categorias
+            function renderCategoryTabs() {
+                const tabsContainer = document.getElementById('category-tabs');
+                const allTab = `
+          <button class="category-tab active" data-category="all">
+            <span><i class="fa-solid fa-border-all"></i></span>
+            <span>Todos</span>
+          </button>
+        `;
+
+                const categoryTabs = data.categories
+                    .sort((a, b) => a.order - b.order)
+                    .map(cat => `
+            <button class="category-tab" data-category="${cat.id}">
+              <span>${cat.icon}</span>
+              <span>${cat.name}</span>
+            </button>
+          `).join('');
+
+                tabsContainer.innerHTML = allTab + categoryTabs;
+
+                // Event listeners para tabs
+                document.querySelectorAll('.category-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        currentCategory = tab.dataset.category;
+                        renderMenu();
+                    });
+                });
+            }
+
+            // Renderiza menu
+            function renderMenu() {
+                const menuContent = document.getElementById('menu-content');
+                let filteredProducts = data.products.filter(p => p.available);
+
+                // Filtro por categoria
+                if (currentCategory !== 'all') {
+                    filteredProducts = filteredProducts.filter(p => p.category === currentCategory);
+                }
+
+                // Filtro por busca
+                if (searchQuery) {
+                    filteredProducts = filteredProducts.filter(p =>
+                        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        p.description.toLowerCase().includes(searchQuery.toLowerCase())
+                    );
+                }
+
+                if (filteredProducts.length === 0) {
+                    menuContent.innerHTML = '<p class="text-center">Nenhum produto encontrado.</p>';
+                    return;
+                }
+
+                // Agrupa por categoria
+                const groupedProducts = {};
+                filteredProducts.forEach(product => {
+                    if (!groupedProducts[product.category]) {
+                        groupedProducts[product.category] = [];
+                    }
+                    groupedProducts[product.category].push(product);
+                });
+
+                // Renderiza por categoria
+                let html = '';
+                data.categories
+                    .sort((a, b) => a.order - b.order)
+                    .forEach(category => {
+                        const products = groupedProducts[category.id];
+                        if (!products || products.length === 0) return;
+
+                        html += `
+              <div class="category-section" id="${category.id}">
+                <div class="category-header">
+                  <span class="category-icon">${category.icon}</span>
+                  <h2>${category.name}</h2>
+                </div>
+                <div class="grid grid-3">
+                  ${products.map(product => `
+                    <div class="card">
+                      <div class="card-image" style="background: linear-gradient(135deg, #E63946 0%, #F77F00 100%); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                        ${category.icon}
+                      </div>
+                      <h3 class="card-title">${product.name}</h3>
+                      <p class="card-description">${product.description}</p>
+                      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                        <span class="card-price">${app.formatPrice(product.price)}</span>
+                        <a href="pedido.html?product=${product.id}" class="btn btn-primary">
+                          <span class="btn-icon"><i class="fa-solid fa-cart-shopping"></i></span>
+                          Pedir
+                        </a>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+                    });
+
+                menuContent.innerHTML = html;
+            }
+
+            // Busca
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderMenu();
+            });
+
+            // Inicializa
+            renderCategoryTabs();
+            renderMenu();
+
+            // Scroll para categoria se houver hash na URL
+            if (window.location.hash) {
+                const categoryId = window.location.hash.substring(1);
+                const categoryElement = document.getElementById(categoryId);
+                if (categoryElement) {
+                    setTimeout(() => {
+                        categoryElement.scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                }
+            }
+
+            // Atualiza footer
+            document.getElementById('footer-hours-weekdays').textContent = data.storeInfo.hours.weekdays;
+            document.getElementById('footer-hours-sunday').textContent = data.storeInfo.hours.sunday;
+            document.getElementById('footer-address').textContent = data.storeInfo.address;
+            document.getElementById('footer-address-complement').textContent = data.storeInfo.addressComplement;
+
+            const whatsappLink = `https://wa.me/${data.config.whatsappNumber}`;
+            document.getElementById('footer-whatsapp').href = whatsappLink;
+            document.getElementById('footer-instagram').href = `https://instagram.com/${data.storeInfo.instagram.replace('@', '')}`;
+        });
+    </script>
+</body>
+
+</html>

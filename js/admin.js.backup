@@ -1,0 +1,464 @@
+// Sistema de administração
+class AdminSystem {
+    constructor() {
+        this.data = getData();
+        this.isAuthenticated = this.checkAuth();
+        this.init();
+    }
+
+    init() {
+        if (!this.isAuthenticated) {
+            this.showLogin();
+        } else {
+            this.showAdmin();
+            this.setupEventListeners();
+            this.loadDashboard();
+        }
+    }
+
+    // Verifica autenticação
+    checkAuth() {
+        return sessionStorage.getItem('adminAuth') === 'true';
+    }
+
+    // Login
+    login(password) {
+        if (password === this.data.config.adminPassword) {
+            sessionStorage.setItem('adminAuth', 'true');
+            this.isAuthenticated = true;
+            window.location.reload();
+            return true;
+        }
+        return false;
+    }
+
+    // Logout
+    logout() {
+        sessionStorage.removeItem('adminAuth');
+        window.location.reload();
+    }
+
+    // Mostra tela de login
+    showLogin() {
+        document.body.innerHTML = `
+      <div class="login-container">
+        <div class="login-card">
+          <div style="text-align: center; margin-bottom: var(--spacing-xl);">
+            <div style="font-size: 4rem; margin-bottom: var(--spacing-sm);">🍕</div>
+            <h1>Painel Admin</h1>
+            <p style="color: var(--gray);">Uai Pizzaria & Doceria</p>
+          </div>
+          
+          <form id="login-form">
+            <div class="form-group">
+              <label class="form-label" for="admin-password">Senha</label>
+              <input type="password" id="admin-password" class="form-input" placeholder="Digite a senha" required autofocus>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;">
+              Entrar
+            </button>
+            
+            <div id="login-error" class="alert alert-danger hidden" style="margin-top: var(--spacing-md);">
+              Senha incorreta!
+            </div>
+          </form>
+          
+          <div style="text-align: center; margin-top: var(--spacing-lg);">
+            <a href="index.html" style="color: var(--gray);">← Voltar ao site</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('admin-password').value;
+            if (!this.login(password)) {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+    }
+
+    // Mostra painel admin
+    showAdmin() {
+        // HTML do painel será carregado do admin.html
+    }
+
+    // Configura event listeners
+    setupEventListeners() {
+        // Navegação entre seções
+        document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const section = btn.dataset.section;
+                this.showSection(section);
+            });
+        });
+
+        // Logout
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => this.logout());
+        }
+    }
+
+    // Mostra seção
+    showSection(sectionId) {
+        document.querySelectorAll('.admin-nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.admin-section').forEach(section => section.classList.remove('active'));
+
+        document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+        document.getElementById(sectionId).classList.add('active');
+
+        // Carrega dados da seção
+        switch (sectionId) {
+            case 'dashboard':
+                this.loadDashboard();
+                break;
+            case 'products':
+                this.loadProducts();
+                break;
+            case 'settings':
+                this.loadSettings();
+                break;
+            case 'delivery':
+                this.loadDeliveryFees();
+                break;
+        }
+    }
+
+    // Carrega dashboard
+    loadDashboard() {
+        const stats = {
+            totalProducts: this.data.products.length,
+            activeProducts: this.data.products.filter(p => p.available).length,
+            categories: this.data.categories.length,
+            siteStatus: this.data.config.sitePaused ? 'Pausado' : 'Ativo',
+            ordersStatus: this.data.config.ordersEnabled ? 'Habilitados' : 'Desabilitados'
+        };
+
+        // Verificar se os elementos existem antes de atualizar
+        const totalProductsEl = document.getElementById('total-products');
+        const activeProductsEl = document.getElementById('active-products');
+        const totalCategoriesEl = document.getElementById('total-categories');
+        const siteStatusEl = document.getElementById('site-status');
+        const ordersStatusEl = document.getElementById('orders-status');
+
+        if (totalProductsEl) totalProductsEl.textContent = stats.totalProducts;
+        if (activeProductsEl) activeProductsEl.textContent = stats.activeProducts;
+        if (totalCategoriesEl) totalCategoriesEl.textContent = stats.categories;
+        if (siteStatusEl) siteStatusEl.textContent = stats.siteStatus;
+        if (ordersStatusEl) ordersStatusEl.textContent = stats.ordersStatus;
+    }
+
+    // Carrega produtos
+    loadProducts() {
+        const tbody = document.getElementById('products-table-body');
+        tbody.innerHTML = this.data.products.map(product => {
+            const category = this.data.categories.find(c => c.id === product.category);
+            return `
+        <tr>
+          <td>${product.name}</td>
+          <td>${category ? category.name : '-'}</td>
+          <td>${app.formatPrice(product.price)}</td>
+          <td>
+            <span class="status-badge ${product.available ? 'status-active' : 'status-inactive'}">
+              ${product.available ? 'Disponível' : 'Indisponível'}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-small btn-warning" onclick="adminSystem.openProductModal('${product.id}')">Editar</button>
+            <button class="btn btn-small btn-danger" onclick="adminSystem.deleteProduct('${product.id}')">Excluir</button>
+          </td>
+        </tr>
+      `;
+        }).join('');
+    }
+
+    // Adiciona produto
+    async addProduct(productData) {
+        const newProduct = {
+            id: 'product-' + Date.now(),
+            category: productData.category,
+            name: productData.name,
+            description: productData.description,
+            price: productData.price,
+            image: productData.image || null,
+            available: true
+        };
+
+        const result = await dbManager.addProduct(newProduct);
+        if (result.success) {
+            this.data = await loadDataFromSupabase();
+            this.loadProducts();
+            this.showAlert('Produto adicionado com sucesso!', 'success');
+        } else {
+            this.showAlert('Erro ao adicionar produto: ' + result.error, 'danger');
+        }
+    }
+
+    // Edita produto
+    async editProduct(productId) {
+        const product = this.data.products.find(p => p.id === productId);
+        if (!product) return;
+
+        const name = prompt('Nome do produto:', product.name);
+        if (!name) return;
+
+        const description = prompt('Descrição:', product.description);
+        if (!description) return;
+
+        const price = parseFloat(prompt('Preço:', product.price));
+        if (isNaN(price)) return;
+
+        const result = await dbManager.updateProduct(productId, {
+            name,
+            description,
+            price
+        });
+
+        if (result.success) {
+            this.data = await loadDataFromSupabase();
+            this.loadProducts();
+            this.showAlert('Produto atualizado com sucesso!', 'success');
+        } else {
+            this.showAlert('Erro ao atualizar produto: ' + result.error, 'danger');
+        }
+    }
+
+    // Deleta produto
+    async deleteProduct(productId) {
+        if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+
+        const result = await dbManager.deleteProduct(productId);
+        if (result.success) {
+            this.data = await loadDataFromSupabase();
+            this.loadProducts();
+            this.showAlert('Produto excluído com sucesso!', 'success');
+        } else {
+            this.showAlert('Erro ao excluir produto: ' + result.error, 'danger');
+        }
+    }
+
+    // ============================================
+    // FUNÇÕES DO MODAL DE PRODUTO
+    // ============================================
+
+    // Abre modal para adicionar ou editar produto
+    openProductModal(productId = null) {
+        const modal = document.getElementById('product-modal');
+        const form = document.getElementById('product-form');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubmitText = document.getElementById('modal-submit-text');
+
+        form.reset();
+
+        if (productId) {
+            // Modo edição
+            const product = this.data.products.find(p => p.id === productId);
+            if (!product) return;
+
+            modalTitle.textContent = 'Editar Produto';
+            modalSubmitText.textContent = 'Salvar Alterações';
+
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-category').value = product.category;
+            document.getElementById('product-description').value = product.description;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-available').value = product.available.toString();
+            document.getElementById('product-image').value = product.image || '';
+        } else {
+            // Modo adicionar
+            modalTitle.textContent = 'Adicionar Produto';
+            modalSubmitText.textContent = 'Adicionar Produto';
+            document.getElementById('product-id').value = '';
+            document.getElementById('product-available').value = 'true';
+        }
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Fecha modal
+    closeProductModal() {
+        const modal = document.getElementById('product-modal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Salva produto (adicionar ou editar)
+    async saveProduct() {
+        document.getElementById('free-delivery-min').value = this.data.config.freeDeliveryMinimum;
+        document.getElementById('delivery-time').value = this.data.config.estimatedDeliveryTime;
+        document.getElementById('admin-password-input').value = this.data.config.adminPassword;
+
+        // Mensagens
+        document.getElementById('welcome-message').value = this.data.messages.welcome;
+        document.getElementById('tagline').value = this.data.messages.tagline;
+        document.getElementById('delivery-banner').value = this.data.messages.deliveryBanner;
+
+        // Informações da loja
+        document.getElementById('store-phone').value = this.data.storeInfo.phone;
+        document.getElementById('store-instagram').value = this.data.storeInfo.instagram;
+        document.getElementById('store-address').value = this.data.storeInfo.address;
+        document.getElementById('store-complement').value = this.data.storeInfo.addressComplement;
+    }
+
+    // Salva configurações
+    async saveSettings() {
+        // Atualizar dados locais
+        this.data.config.sitePaused = document.getElementById('site-paused').checked;
+        this.data.config.ordersEnabled = document.getElementById('orders-enabled').checked;
+        this.data.config.whatsappNumber = document.getElementById('whatsapp-number').value;
+        this.data.config.freeDeliveryMinimum = parseFloat(document.getElementById('free-delivery-min').value);
+        this.data.config.estimatedDeliveryTime = document.getElementById('delivery-time').value;
+        this.data.config.adminPassword = document.getElementById('admin-password-input').value;
+
+        this.data.config.welcomeMessage = document.getElementById('welcome-message').value;
+        this.data.config.tagline = document.getElementById('tagline').value;
+        this.data.config.deliveryBanner = document.getElementById('delivery-banner').value;
+
+        this.data.storeInfo.phone = document.getElementById('store-phone').value;
+        this.data.storeInfo.instagram = document.getElementById('store-instagram').value;
+        this.data.storeInfo.address = document.getElementById('store-address').value;
+        this.data.storeInfo.addressComplement = document.getElementById('store-complement').value;
+
+        // Salvar no Supabase
+        try {
+            await saveData(this.data);
+
+            // Limpar cache para forçar recarregamento
+            dbManager.clearCache();
+            cachedData = null;
+
+            this.showAlert('Configurações salvas com sucesso! As alterações aparecerão no site.', 'success');
+            this.loadDashboard();
+        } catch (error) {
+            this.showAlert('Erro ao salvar configurações: ' + error.message, 'danger');
+        }
+    }
+
+    // Carrega taxas de entrega
+    loadDeliveryFees() {
+        const tbody = document.getElementById('delivery-fees-table-body');
+        tbody.innerHTML = this.data.deliveryFees.map((fee, index) => `
+      <tr>
+        <td>${fee.neighborhood}</td>
+        <td>${app.formatPrice(fee.fee)}</td>
+        <td>
+          <button class="btn btn-small btn-warning" onclick="adminSystem.editDeliveryFee(${index})">Editar</button>
+          <button class="btn btn-small btn-danger" onclick="adminSystem.deleteDeliveryFee(${index})">Excluir</button>
+        </td>
+      </tr>
+    `).join('');
+    }
+
+    // Adiciona taxa de entrega
+    addDeliveryFee() {
+        const neighborhood = prompt('Nome do bairro:');
+        if (!neighborhood) return;
+
+        const fee = parseFloat(prompt('Taxa de entrega:'));
+        if (isNaN(fee)) return;
+
+        this.data.deliveryFees.push({ neighborhood, fee });
+        saveData(this.data);
+        this.loadDeliveryFees();
+        this.showAlert('Taxa adicionada com sucesso!', 'success');
+    }
+
+    // Edita taxa de entrega
+    editDeliveryFee(index) {
+        const deliveryFee = this.data.deliveryFees[index];
+
+        const neighborhood = prompt('Nome do bairro:', deliveryFee.neighborhood);
+        if (!neighborhood) return;
+
+        const fee = parseFloat(prompt('Taxa de entrega:', deliveryFee.fee));
+        if (isNaN(fee)) return;
+
+        this.data.deliveryFees[index] = { neighborhood, fee };
+        saveData(this.data);
+        this.loadDeliveryFees();
+        this.showAlert('Taxa atualizada com sucesso!', 'success');
+    }
+
+    // Deleta taxa de entrega
+    deleteDeliveryFee(index) {
+        if (!confirm('Tem certeza que deseja excluir esta taxa?')) return;
+
+        this.data.deliveryFees.splice(index, 1);
+        saveData(this.data);
+        this.loadDeliveryFees();
+        this.showAlert('Taxa excluída com sucesso!', 'success');
+    }
+
+    // Exporta dados
+    exportData() {
+        const dataStr = JSON.stringify(this.data, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `uai-pizzaria-backup-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        this.showAlert('Backup exportado com sucesso!', 'success');
+    }
+
+    // Importa dados
+    importData(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (confirm('Tem certeza que deseja importar estes dados? Isso substituirá todos os dados atuais!')) {
+                    saveData(importedData);
+                    this.data = importedData;
+                    this.showAlert('Dados importados com sucesso! Recarregando...', 'success');
+                    setTimeout(() => window.location.reload(), 2000);
+                }
+            } catch (error) {
+                this.showAlert('Erro ao importar dados. Verifique o arquivo.', 'danger');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // Mostra alerta
+    showAlert(message, type = 'success') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+        alertDiv.textContent = message;
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.zIndex = '9999';
+        alertDiv.style.minWidth = '300px';
+
+        document.body.appendChild(alertDiv);
+
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    }
+}
+
+// Inicializa sistema admin
+let adminSystem = null;
+
+// Aguardar carregamento dos dados do Supabase
+window.addEventListener('dataLoaded', (event) => {
+    if (!adminSystem) {
+        adminSystem = new AdminSystem();
+    }
+});
+
+// Fallback caso os dados já estejam carregados
+document.addEventListener('DOMContentLoaded', () => {
+    // Se os dados já foram carregados antes do DOMContentLoaded
+    if (typeof cachedData !== 'undefined' && cachedData !== null && !adminSystem) {
+        adminSystem = new AdminSystem();
+    }
+});
+

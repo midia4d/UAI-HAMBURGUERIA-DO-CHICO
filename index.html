@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Uai Pizzaria & Doceria - Pizzas artesanais e doces deliciosos. Delivery e retirada no local.">
+  <meta name="theme-color" content="#E63946">
+
+  <title>Uai Pizzaria & Doceria - Porque toda história de amor merece um bom começo</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/toast.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="nav">
+      <a href="index.html" class="logo">
+        <span class="logo-icon"><i class="fa-solid fa-pizza-slice"></i></span>
+        <span>Uai Pizzaria</span>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="cardapio.html" class="nav-link">Cardápio</a></li>
+        <li><a href="pedido.html" class="nav-link">Fazer Pedido</a></li>
+        <li><a href="info.html" class="nav-link">Informações</a></li>
+      </ul>
+
+      <button class="menu-toggle" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-greeting">Boa noite, seja bem-vindo</p>
+      <h1 class="hero-title">Uai Pizzaria & Doceria</h1>
+      <p class="hero-tagline">Porque toda história de amor merece um bom começo</p>
+
+      <div class="hero-banner">
+        <p class="hero-banner-text">
+          <i class="fa-solid fa-tag"></i> Taxa de entrega GRÁTIS para pedidos acima de R$60,00
+        </p>
+      </div>
+
+      <a href="pedido.html" class="btn btn-primary btn-large">
+        <span class="btn-icon"><i class="fab fa-whatsapp"></i></span>
+        Fazer Pedido pelo WhatsApp
+      </a>
+    </div>
+  </section>
+
+  <!-- Destaques do Cardápio -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Nossos Destaques</h2>
+        <p>Conheça alguns dos nossos produtos mais queridos</p>
+      </div>
+
+      <div class="grid grid-3" id="featured-products">
+        <!-- Produtos serão carregados via JavaScript -->
+      </div>
+
+      <div class="text-center mt-3">
+        <a href="cardapio.html" class="btn btn-secondary btn-large">
+          Ver Cardápio Completo
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categorias -->
+  <section class="section" style="background: white;">
+    <div class="container">
+      <div class="section-title">
+        <h2>Nossas Categorias</h2>
+        <p>Explore nosso cardápio completo</p>
+      </div>
+
+      <div class="grid grid-4" id="categories">
+        <!-- Categorias serão carregadas via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Como Funciona -->
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <h2>Como Fazer seu Pedido</h2>
+      </div>
+
+      <div class="grid grid-3">
+        <div class="card text-center">
+          <div class="how-icon"><i class="fa-solid fa-list"></i></div>
+          <h3>1. Escolha</h3>
+          <p>Navegue pelo nosso cardápio e escolha seus produtos favoritos</p>
+        </div>
+
+        <div class="card text-center">
+          <div class="how-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+          <h3>2. Monte seu Pedido</h3>
+          <p>Adicione os itens ao carrinho e escolha entrega ou retirada</p>
+        </div>
+
+        <div class="card text-center">
+          <div class="how-icon"><i class="fab fa-whatsapp"></i></div>
+          <h3>3. Finalize no WhatsApp</h3>
+          <p>Confirme seu pedido diretamente pelo WhatsApp</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>Uai Pizzaria & Doceria</h3>
+          <p>Porque toda história de amor merece um bom começo</p>
+        </div>
+
+        <div class="footer-section">
+          <h3>Horário de Funcionamento</h3>
+          <p id="footer-hours-weekdays">Segunda a Sábado: 16:00 às 03:00</p>
+          <p id="footer-hours-sunday">Domingo: 20:00 às 03:00</p>
+        </div>
+
+        <div class="footer-section">
+          <h3>Localização</h3>
+          <p id="footer-address">Rua Alagoas, 70B – Cristo Redentor</p>
+          <p id="footer-address-complement">Do lado do Hotel Mirian / atrás da rodoviária</p>
+        </div>
+
+        <div class="footer-section">
+          <h3>Contato</h3>
+          <a href="#" id="footer-whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+          <a href="#" id="footer-instagram"><i class="fab fa-instagram"></i> Instagram</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Uai Pizzaria & Doceria. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp Floating Button -->
+  <a href="#" class="whatsapp-float" aria-label="WhatsApp">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M16 0C7.164 0 0 7.163 0 16c0 2.826.736 5.587 2.138 8.024L.07 31.765l8.026-2.052A15.93 15.93 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.455c-2.516 0-4.97-.702-7.095-2.03l-.51-.304-5.29 1.353 1.38-5.16-.334-.53A13.39 13.39 0 0 1 2.545 16c0-7.42 6.035-13.455 13.455-13.455S29.455 8.58 29.455 16 23.42 29.455 16 29.455z" />
+      <path
+        d="M23.14 19.47c-.39-.195-2.31-1.14-2.67-1.27-.36-.13-.62-.195-.88.195-.26.39-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.195-1.645-.606-3.133-1.933-1.158-1.033-1.94-2.31-2.168-2.7-.228-.39-.024-.6.17-.795.175-.175.39-.455.585-.683.195-.228.26-.39.39-.65.13-.26.065-.487-.033-.683-.098-.195-.88-2.12-1.205-2.9-.317-.76-.64-.657-.88-.67-.228-.013-.487-.016-.747-.016s-.683.098-1.04.487c-.357.39-1.363 1.333-1.363 3.25s1.396 3.77 1.59 4.03c.195.26 2.745 4.19 6.65 5.875.93.402 1.656.642 2.222.822.934.297 1.785.255 2.458.155.75-.112 2.31-.944 2.635-1.856.325-.912.325-1.694.228-1.856-.098-.162-.358-.26-.748-.455z" />
+    </svg>
+  </a>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Carrega produtos em destaque (primeiros 6)
+    // Aguardar carregamento dos dados do Supabase
+    window.addEventListener('dataLoaded', (event) => {
+      // Garantir que app existe
+      if (!window.app) {
+        window.app = new UaiPizzaria();
+      }
+
+      const data = event.detail || getData();
+      const featuredProducts = data.products.filter(p => p.available).slice(0, 6);
+      app.renderProducts(featuredProducts, 'featured-products');
+
+      // Carrega categorias
+      const categoriesContainer = document.getElementById('categories');
+      if (categoriesContainer) {
+        categoriesContainer.innerHTML = data.categories.map(cat => `
+          <a href="cardapio.html#${cat.id}" class="card text-center" style="text-decoration: none;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">${cat.icon}</div>
+            <h3>${cat.name}</h3>
+          </a>
+        `).join('');
+      }
+
+      // Atualiza footer com dados
+      document.getElementById('footer-hours-weekdays').textContent = data.storeInfo.hours.weekdays;
+      document.getElementById('footer-hours-sunday').textContent = data.storeInfo.hours.sunday;
+      document.getElementById('footer-address').textContent = data.storeInfo.address;
+      document.getElementById('footer-address-complement').textContent = data.storeInfo.addressComplement;
+
+      const whatsappLink = `https://wa.me/${data.config.whatsappNumber}`;
+      document.getElementById('footer-whatsapp').href = whatsappLink;
+      document.getElementById('footer-instagram').href = `https://instagram.com/${data.storeInfo.instagram.replace('@', '')}`;
+    });
+  </script>
+</body>
+
+</html>

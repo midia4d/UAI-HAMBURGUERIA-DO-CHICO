@@ -1,0 +1,17 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E63946;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F77F00;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="256" fill="url(#grad)"/>
+  <circle cx="256" cy="256" r="200" fill="#FFF8F0"/>
+  <path d="M256 100 L350 200 L320 350 L192 350 L162 200 Z" fill="url(#grad)"/>
+  <circle cx="200" cy="220" r="15" fill="#E63946"/>
+  <circle cx="256" cy="200" r="15" fill="#E63946"/>
+  <circle cx="312" cy="220" r="15" fill="#E63946"/>
+  <circle cx="230" cy="270" r="15" fill="#E63946"/>
+  <circle cx="282" cy="270" r="15" fill="#E63946"/>
+  <text x="256" y="420" font-family="Arial, sans-serif" font-size="80" font-weight="bold" fill="#E63946" text-anchor="middle">🍕</text>
+</svg>

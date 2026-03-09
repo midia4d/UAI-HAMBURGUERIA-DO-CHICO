@@ -1,0 +1,938 @@
+/* Admin Panel Styles */
+
+:root {
+    --admin-primary: #2563EB;
+    --admin-success: #10B981;
+    --admin-danger: #EF4444;
+    --admin-warning: #F59E0B;
+}
+
+body {
+    background: var(--cream);
+}
+
+.admin-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.admin-header {
+    background: var(--gradient-primary);
+    color: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+}
+
+.admin-nav {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xl);
+    overflow-x: auto;
+}
+
+.admin-nav-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+}
+
+.admin-nav-btn.active {
+    background: var(--admin-primary);
+    color: var(--white);
+    border-color: var(--admin-primary);
+}
+
+.admin-section {
+    display: none;
+}
+
+.admin-section.active {
+    display: block;
+}
+
+.admin-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.admin-card h2 {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--spacing-md);
+}
+
+.table th,
+.table td {
+    padding: var(--spacing-sm);
+    text-align: left;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.table th {
+    background: var(--cream);
+    font-weight: 600;
+}
+
+.table tr:hover {
+    background: var(--cream);
+}
+
+.btn-small {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.875rem;
+    min-height: auto;
+}
+
+.btn-success {
+    background: var(--admin-success);
+    color: var(--white);
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+.btn-danger {
+    background: var(--admin-danger);
+    color: var(--white);
+}
+
+.btn-danger:hover {
+    background: #DC2626;
+}
+
+.btn-warning {
+    background: var(--admin-warning);
+    color: var(--white);
+}
+
+.btn-warning:hover {
+    background: #D97706;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--gray);
+    transition: var(--transition-base);
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: var(--transition-base);
+    border-radius: 50%;
+}
+
+input:checked+.toggle-slider {
+    background-color: var(--admin-success);
+}
+
+input:checked+.toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.status-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.status-inactive {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.alert {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.alert-success {
+    background: #D1FAE5;
+    color: #065F46;
+    border-left: 4px solid var(--admin-success);
+}
+
+.alert-danger {
+    background: #FEE2E2;
+    color: #991B1B;
+    border-left: 4px solid var(--admin-danger);
+}
+
+.alert-warning {
+    background: #FEF3C7;
+    color: #92400E;
+    border-left: 4px solid var(--admin-warning);
+}
+
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+}
+
+.login-card {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-xl);
+    max-width: 400px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .admin-nav {
+        flex-wrap: wrap;
+    }
+
+    .table {
+        font-size: 0.875rem;
+    }
+
+    .table th,
+    .table td {
+        padding: var(--spacing-xs);
+    }
+}
+
+/* ============================================
+   SISTEMA DE PEDIDOS EM TEMPO REAL
+   ============================================ */
+
+/* Badge na aba de Pedidos */
+.orders-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #EF4444;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 6px;
+    animation: pulse-badge 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-badge {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* Cabeçalho de Pedidos */
+.orders-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.orders-header h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/* Indicador de Tempo Real */
+.realtime-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--gray);
+    background: #F3F4F6;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+.realtime-indicator.connected {
+    color: #065F46;
+    background: #D1FAE5;
+}
+
+.realtime-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--gray);
+    flex-shrink: 0;
+}
+
+.realtime-indicator.connected .realtime-dot {
+    background: #10B981;
+    animation: pulse-realtime 2s ease-in-out infinite;
+}
+
+@keyframes pulse-realtime {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.6;
+        transform: scale(0.85);
+    }
+}
+
+/* Filtros de Status */
+.orders-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-md);
+}
+
+.order-filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 2px solid var(--light-gray);
+    background: var(--white);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.order-filter-btn.active,
+.order-filter-btn:hover {
+    background: var(--admin-primary);
+    color: var(--white);
+    border-color: var(--admin-primary);
+}
+
+/* Toolbar de pedidos */
+.orders-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Estado vazio */
+.orders-empty {
+    text-align: center;
+    padding: var(--spacing-2xl) 0;
+    color: var(--gray);
+}
+
+/* Card de Pedido */
+.order-card {
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
+    background: var(--white);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.order-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+}
+
+.order-card.status-pending {
+    border-color: #FDE68A;
+}
+
+.order-card.status-pending::before {
+    background: #F59E0B;
+}
+
+.order-card.status-preparing {
+    border-color: #BFDBFE;
+}
+
+.order-card.status-preparing::before {
+    background: #3B82F6;
+}
+
+.order-card.status-delivering {
+    border-color: #FED7AA;
+}
+
+.order-card.status-delivering::before {
+    background: #F97316;
+}
+
+.order-card.status-delivered {
+    border-color: #BBF7D0;
+}
+
+.order-card.status-delivered::before {
+    background: #10B981;
+}
+
+.order-card.status-cancelled {
+    border-color: #FECACA;
+}
+
+.order-card.status-cancelled::before {
+    background: #EF4444;
+}
+
+.order-card.new-order {
+    animation: highlight-new 1s ease-in-out 3;
+}
+
+@keyframes highlight-new {
+
+    0%,
+    100% {
+        box-shadow: var(--shadow-md);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+    }
+}
+
+/* Cabeçalho do card */
+.order-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.order-id {
+    font-size: 0.875rem;
+    color: var(--gray);
+    font-weight: 500;
+}
+
+.order-time {
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+.order-customer {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.order-phone {
+    font-size: 0.875rem;
+    color: var(--gray);
+}
+
+/* Badge de status no card */
+.order-status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.badge-pending {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.badge-preparing {
+    background: #DBEAFE;
+    color: #1E40AF;
+}
+
+.badge-delivering {
+    background: #FFEDD5;
+    color: #9A3412;
+}
+
+.badge-delivered {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.badge-cancelled {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+/* Itens do pedido */
+.order-items {
+    background: #F9FAFB;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin: var(--spacing-sm) 0;
+    font-size: 0.9rem;
+}
+
+.order-item-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.order-item-row:last-child {
+    border-bottom: none;
+}
+
+/* Total do pedido */
+.order-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary);
+    border-top: 2px solid var(--light-gray);
+}
+
+/* Tipo de entrega */
+.order-delivery-info {
+    font-size: 0.875rem;
+    color: var(--gray);
+    margin: var(--spacing-xs) 0;
+}
+
+/* Ações do card */
+.order-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-md);
+}
+
+.order-actions .btn {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    min-height: auto;
+}
+
+/* Toast de novo pedido especial */
+.new-order-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #E63946, #F77F00);
+    color: white;
+    padding: 16px 24px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 99999;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: slide-in-toast 0.4s ease-out;
+    cursor: pointer;
+}
+
+@keyframes slide-in-toast {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Botão WhatsApp nos cards de pedido */
+.btn-whatsapp {
+    background: #25D366;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-whatsapp:hover {
+    background: #1ebe57;
+    transform: translateY(-1px);
+}
+
+.btn-whatsapp:active {
+    transform: translateY(0);
+}
+
+/* Botão Imprimir */
+.btn-print {
+    background: #4B5563;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-print:hover {
+    background: #374151;
+    transform: translateY(-1px);
+}
+
+.btn-print:active {
+    transform: translateY(0);
+}
+
+/* Ícones do dashboard */
+.dashboard-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+    line-height: 1;
+}
+
+/* Tela vazia de pedidos */
+.orders-empty-icon {
+    font-size: 3rem;
+    color: var(--gray);
+    margin-bottom: var(--spacing-sm);
+    opacity: 0.5;
+}
+
+/* ========================================
+   RELATÓRIOS
+   ======================================== */
+
+/* Seletor de período */
+.period-selector {
+    display: flex;
+    gap: 6px;
+}
+
+.period-btn {
+    padding: 6px 16px;
+    border: 2px solid var(--light-gray);
+    border-radius: 20px;
+    background: var(--white);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--gray);
+}
+
+.period-btn:hover {
+    border-color: var(--admin-primary);
+    color: var(--admin-primary);
+}
+
+.period-btn.active {
+    background: var(--admin-primary);
+    border-color: var(--admin-primary);
+    color: #fff;
+}
+
+/* Grid de KPIs */
+.report-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
+}
+
+.kpi-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid var(--light-gray);
+}
+
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.kpi-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.kpi-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--dark);
+    line-height: 1.1;
+    margin-bottom: 6px;
+    font-family: var(--font-primary, 'Poppins', sans-serif);
+}
+
+.kpi-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Grid de gráficos */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.chart-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--light-gray);
+}
+
+.chart-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-card h3 i {
+    color: var(--admin-primary);
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-height: 300px;
+}
+
+/* ========================================
+   HISTÓRICO DE PEDIDOS
+   ======================================== */
+
+.history-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--admin-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--light-gray);
+}
+
+.history-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    flex: 1;
+    min-width: 220px;
+    transition: border-color 0.2s;
+}
+
+.history-search:focus-within {
+    border-color: var(--admin-primary);
+}
+
+.history-search i {
+    color: var(--gray);
+}
+
+.history-search input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 0.9rem;
+    background: transparent;
+}
+
+.history-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+}
+
+.history-filter-group input[type="date"],
+.history-filter-group select {
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.history-filter-group input[type="date"]:focus,
+.history-filter-group select:focus {
+    outline: none;
+    border-color: var(--admin-primary);
+}
+
+/* Resumo rápido */
+.history-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: var(--spacing-md);
+}
+
+.history-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    color: var(--dark);
+}
+
+.history-stat i {
+    color: var(--admin-primary);
+}
+
+/* Tabela */
+.history-table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--light-gray);
+}
+
+.history-table {
+    min-width: 800px;
+}
+
+.history-table tbody tr:hover {
+    background: rgba(230, 57, 70, 0.04);
+}
+
+.history-count {
+    margin-top: 10px;
+    font-size: 0.82rem;
+    color: var(--gray);
+    text-align: right;
+}
+
+/* ========================================
+   RASTREAMENTO DE PEDIDO
+   ======================================== */
+
+.btn-tracking {
+    background: #7C3AED;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+}
+
+.btn-tracking:hover {
+    background: #6D28D9;
+    transform: translateY(-1px);
+}
