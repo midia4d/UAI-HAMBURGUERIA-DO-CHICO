@@ -295,14 +295,22 @@
                         html += `
               <div class="category-section" id="${category.id}">
                 <div class="category-header">
-                  <span class="category-icon">${category.icon}</span>
+                  <span class="category-icon"><i class="${category.icon}"></i></span>
                   <h2>${category.name}</h2>
                 </div>
                 <div class="grid grid-3">
-                  ${products.map(product => `
+                  ${products.map(product => {
+                            const hasImage = !!product.image;
+                            const imageHtml = hasImage
+                                ? `<img src="${product.image}" alt="${product.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">`
+                                : `<div style="background: linear-gradient(135deg, #E63946 0%, #F77F00 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem;">
+                               <i class="${category.icon}" style="color: rgba(255,255,255,0.8);"></i>
+                             </div>`;
+
+                            return `
                     <div class="card">
-                      <div class="card-image" style="background: linear-gradient(135deg, #E63946 0%, #F77F00 100%); display: flex; align-items: center; justify-content: center; font-size: 4rem;">
-                        ${category.icon}
+                      <div class="card-image" style="padding: 0; overflow: hidden; background: #f0f0f0;">
+                        ${imageHtml}
                       </div>
                       <h3 class="card-title">${product.name}</h3>
                       <p class="card-description">${product.description}</p>
@@ -314,7 +322,8 @@
                         </a>
                       </div>
                     </div>
-                  `).join('')}
+                  `;
+                        }).join('')}
                 </div>
               </div>
             `;
