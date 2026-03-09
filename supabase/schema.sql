@@ -157,8 +157,13 @@ ALTER TABLE delivery_fees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE store_info ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 
--- Políticas de LEITURA PÚBLICA (qualquer um pode ler)
+-- ===================================
+-- LEITURA (SELECT)
+-- ===================================
+
+-- Dados do catálogo são públicos
 DROP POLICY IF EXISTS "Permitir leitura pública de categorias" ON categories;
 CREATE POLICY "Permitir leitura pública de categorias" ON categories FOR SELECT USING (true);
 
@@ -168,31 +173,70 @@ CREATE POLICY "Permitir leitura pública de produtos" ON products FOR SELECT USI
 DROP POLICY IF EXISTS "Permitir leitura pública de taxas de entrega" ON delivery_fees;
 CREATE POLICY "Permitir leitura pública de taxas de entrega" ON delivery_fees FOR SELECT USING (true);
 
+-- Configurações e informações de loja públicas (VITAL não ter admin_password na config com essa política, será limpo depois)
 DROP POLICY IF EXISTS "Permitir leitura pública de configurações" ON config;
 CREATE POLICY "Permitir leitura pública de configurações" ON config FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Permitir leitura pública de informações da loja" ON store_info;
 CREATE POLICY "Permitir leitura pública de informações da loja" ON store_info FOR SELECT USING (true);
 
--- Políticas de ESCRITA PÚBLICA (temporário - para desenvolvimento sem autenticação)
--- IMPORTANTE: Em produção, você deve restringir isso apenas para usuários autenticados como admin
+-- ===================================
+-- ESCRITA (INSERT/UPDATE/DELETE) DA LOJA
+-- Apenas usuários autenticados via auth.users (Admin)
+-- ===================================
 DROP POLICY IF EXISTS "Permitir escrita em categorias" ON categories;
-CREATE POLICY "Permitir escrita em categorias" ON categories FOR ALL USING (true);
+CREATE POLICY "Permitir escrita em categorias" ON categories 
+FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 DROP POLICY IF EXISTS "Permitir escrita em produtos" ON products;
-CREATE POLICY "Permitir escrita em produtos" ON products FOR ALL USING (true);
+CREATE POLICY "Permitir escrita em produtos" ON products 
+FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 DROP POLICY IF EXISTS "Permitir escrita em taxas de entrega" ON delivery_fees;
-CREATE POLICY "Permitir escrita em taxas de entrega" ON delivery_fees FOR ALL USING (true);
+CREATE POLICY "Permitir escrita em taxas de entrega" ON delivery_fees 
+FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 DROP POLICY IF EXISTS "Permitir escrita em configurações" ON config;
-CREATE POLICY "Permitir escrita em configurações" ON config FOR ALL USING (true);
+CREATE POLICY "Permitir escrita em configurações" ON config 
+FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
 DROP POLICY IF EXISTS "Permitir escrita em informações da loja" ON store_info;
-CREATE POLICY "Permitir escrita em informações da loja" ON store_info FOR ALL USING (true);
+CREATE POLICY "Permitir escrita em informações da loja" ON store_info 
+FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
 
-DROP POLICY IF EXISTS "Permitir escrita em pedidos" ON orders;
-CREATE POLICY "Permitir escrita em pedidos" ON orders FOR ALL USING (true);
+DROP POLICY IF EXISTS "Permitir gerenciar cupons" ON coupons;
+CREATE POLICY "Permitir gerenciar cupons" ON coupons 
+FOR ALL USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+
+-- ===================================
+-- POLÍTICAS DE PEDIDOS (ORDERS) E CUPONS
+-- ===================================
+
+-- Qualquer um pode LER (validar) um cupom
+DROP POLICY IF EXISTS "Permitir leitura pública de cupons" ON coupons;
+CREATE POLICY "Permitir leitura pública de cupons" ON coupons FOR SELECT USING (true);
+
+-- Qualquer pessoa (anônima) pode CRIAR um novo pedido (Página de Pedido Front-End)
+DROP POLICY IF EXISTS "Permitir criação publica de pedidos" ON orders;
+CREATE POLICY "Permitir criação publica de pedidos" ON orders FOR INSERT WITH CHECK (true);
+
+-- APENAS O ADMIN pode ATUALIZAR, LISTAR ou DELETAR pedidos (Painel Admin)
+DROP POLICY IF EXISTS "Admin gerencia pedidos" ON orders;
+CREATE POLICY "Admin gerencia pedidos" ON orders FOR ALL 
+USING (auth.role() = 'authenticated') WITH CHECK (auth.role() = 'authenticated');
+
+-- CLIENTE VENDO PRÓPRIO PEDIDO:
+-- Usamos SECURITY DEFINER em uma função para ler apenas 1 pedido específico de forma isolada,
+-- sem vazar (.select('*')) no RLS inteiro e expor todo faturamento aos concorrentes.
+
+CREATE OR REPLACE FUNCTION get_order_tracking(p_order_id UUID)
+RETURNS SETOF orders
+LANGUAGE sql
+SECURITY DEFINER
+AS $$
+  SELECT * FROM orders WHERE id = p_order_id LIMIT 1;
+$$;
 
 
 -- ============================================

@@ -2,8 +2,13 @@
 class AdminSystem {
     constructor() {
         this.data = getData();
-        this.isAuthenticated = this.checkAuth();
-        this.init();
+        this.isAuthenticated = false;
+
+        // Verifica a sessão inicial do Supabase de forma assíncrona
+        this.checkAuth().then(isAuth => {
+            this.isAuthenticated = isAuth;
+            this.init();
+        });
     }
 
     init() {
@@ -22,26 +27,57 @@ class AdminSystem {
         }
     }
 
-    // Verifica autenticação
-    checkAuth() {
-        return sessionStorage.getItem('adminAuth') === 'true';
+    // Verifica autenticação com Supabase
+    async checkAuth() {
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            return !!session;
+        } catch (error) {
+            console.error('Erro ao verificar auth:', error);
+            return false;
+        }
     }
 
     // Login
-    login(password) {
-        if (password === this.data.config.adminPassword) {
-            sessionStorage.setItem('adminAuth', 'true');
-            this.isAuthenticated = true;
+    async login(email, password) {
+        try {
+            const btn = document.querySelector('#login-form button');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Entrando...';
+            }
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) throw error;
+
+            this.isAuthenticated = !!data.session;
             window.location.reload();
             return true;
+        } catch (error) {
+            alert('Falha no login: Email ou senha incorretos.');
+            console.error('Login erro:', error);
+
+            const btn = document.querySelector('#login-form button');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = 'Entrar';
+            }
+            return false;
         }
-        return false;
     }
 
     // Logout
-    logout() {
-        sessionStorage.removeItem('adminAuth');
-        window.location.reload();
+    async logout() {
+        try {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        } catch (e) {
+            window.location.reload();
+        }
     }
 
     // Mostra tela de login
@@ -56,6 +92,10 @@ class AdminSystem {
           </div>
           
           <form id="login-form">
+            <div class="form-group">
+              <label class="form-label" for="admin-email">E-mail</label>
+              <input type="email" id="admin-email" class="form-control" required placeholder="admin@uaihamburgueria.com">
+            </div>
             <div class="form-group">
               <label class="form-label" for="admin-password">Senha</label>
               <input type="password" id="admin-password" class="form-input" placeholder="Digite a senha" required autofocus>
@@ -77,11 +117,16 @@ class AdminSystem {
       </div>
     `;
 
-        document.getElementById('login-form').addEventListener('submit', (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const email = document.getElementById('admin-email').value;
             const password = document.getElementById('admin-password').value;
-            if (!this.login(password)) {
-                document.getElementById('login-error').classList.remove('hidden');
+
+            const success = await this.login(email, password);
+            if (!success) {
+                const errDiv = document.getElementById('login-error');
+                errDiv.classList.remove('hidden');
+                errDiv.textContent = 'Erro ao fazer login com estas credenciais.';
             }
         });
     }
@@ -1284,14 +1329,9 @@ class AdminSystem {
                 estimated_delivery_time: document.getElementById('delivery-time').value,
                 welcome_message: document.getElementById('welcome-message').value,
                 tagline: document.getElementById('tagline').value,
-                delivery_banner: document.getElementById('delivery-banner').value
+                delivery_banner: document.getElementById('delivery-banner').value,
+                pix_key: (document.getElementById('pix-key')?.value || '').trim()
             };
-
-            // Se digitou algo na senha, atualiza
-            const newPassword = document.getElementById('admin-password-input').value;
-            if (newPassword && newPassword.trim() !== '') {
-                configData.admin_password = newPassword.trim();
-            }
 
             // Objeto StoreInfo
             const storeInfoData = {

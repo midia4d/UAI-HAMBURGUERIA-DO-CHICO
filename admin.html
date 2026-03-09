@@ -574,6 +574,31 @@
                     <input type="text" id="delivery-time" class="form-input" placeholder="45 a 60 minutos">
                 </div>
 
+                <!-- Chave Pix -->
+                <div
+                    style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #86efac; border-radius: var(--radius-md); padding: var(--spacing-md); margin-top: var(--spacing-md);">
+                    <h3
+                        style="margin:0 0 var(--spacing-sm) 0; color:#15803d; display:flex; align-items:center; gap:8px;">
+                        <i class="fa-brands fa-pix" style="color:#32bcad;"></i> Pagamento via PIX
+                    </h3>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Chave PIX</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="text" id="pix-key" class="form-input"
+                                placeholder="CPF, CNPJ, email, celular ou chave aleatória" style="flex:1;">
+                            <button type="button" onclick="adminSystem.copyPixKey()" class="btn btn-secondary"
+                                style="min-width:44px; padding:10px 14px;" title="Copiar chave">
+                                <i class="fa-solid fa-copy"></i>
+                            </button>
+                        </div>
+                        <small style="color:#166534; margin-top:6px; display:block;">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Esta chave será exibida automaticamente na página de pedido quando o cliente escolher PIX.
+                        </small>
+                    </div>
+                </div>
+
+
                 <h3 style="margin-top: var(--spacing-lg);">Mensagens do Site</h3>
                 <div class="form-group">
                     <label class="form-label">Mensagem de Boas-Vindas</label>
@@ -616,11 +641,15 @@
 
                 <h3 style="margin-top: var(--spacing-lg);">Segurança</h3>
                 <div class="form-group">
-                    <label class="form-label">Senha do Admin</label>
-                    <input type="password" id="admin-password-input" class="form-input">
-                    <p style="font-size: 0.875rem; color: var(--gray); margin-top: var(--spacing-xs);">
-                        Altere a senha padrão para maior segurança
-                    </p>
+                    <div
+                        style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: var(--spacing-md); color: #475569; font-size: 0.9rem;">
+                        <i class="fa-solid fa-shield-halved" style="color: #3b82f6; margin-right: 8px;"></i>
+                        <strong>Segurança Ativada:</strong> O gerenciamento de credenciais (e-mail e senha) agora é
+                        protegido criptograficamente pelo <a
+                            href="https://supabase.com/dashboard/project/rsgzhywafuftizmpvuwy/auth/users"
+                            target="_blank" style="color:#2563eb; text-decoration:underline;">Supabase Auth</a>. Para
+                        alterar seu acesso, utilize o painel oficial do banco de dados.
+                    </div>
                 </div>
 
                 <button class="btn btn-success btn-large" onclick="adminSystem.saveSettings()">
