@@ -215,7 +215,7 @@ class UaiPizzaria {
         container.innerHTML = products.map(product => {
             const hasImage = !!product.image;
             const imageHtml = hasImage
-                ? `<img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">`
+                ? `<img src="${product.image}" alt="${product.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">`
                 : `<div style="background: linear-gradient(135deg, #E63946 0%, #F77F00 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem;">
                     ${this.getCategoryIcon(product.category)}
                    </div>`;
