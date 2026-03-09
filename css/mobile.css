@@ -1,0 +1,539 @@
+/* =====================================================
+   MOBILE.CSS - UAI PIZZARIA & DOCERIA
+   Responsividade para Tablets (768px) e Mobile (480px)
+   ===================================================== */
+
+/* =====================================================
+   TABLET (até 768px)
+   ===================================================== */
+@media (max-width: 768px) {
+
+    /* ---- CONTAINER ---- */
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+
+    .section {
+        padding: var(--spacing-xl) 0;
+    }
+
+    /* ---- NAVEGAÇÃO ---- */
+    .nav {
+        padding: var(--spacing-sm);
+        position: relative;
+    }
+
+    .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.97);
+        backdrop-filter: blur(10px);
+        flex-direction: column;
+        gap: 0;
+        padding: var(--spacing-sm) 0;
+        box-shadow: var(--shadow-md);
+        border-top: 1px solid var(--light-gray);
+        z-index: 999;
+    }
+
+    .nav-menu.active {
+        display: flex;
+    }
+
+    .nav-menu li {
+        width: 100%;
+    }
+
+    .nav-link {
+        display: block;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-radius: 0;
+        font-size: 1.05rem;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .nav-link:last-child {
+        border-bottom: none;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+
+    .logo {
+        font-size: 1.25rem;
+    }
+
+    .logo-icon {
+        font-size: 1.5rem;
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+        padding: var(--spacing-xl) var(--spacing-sm);
+        min-height: auto;
+        padding-top: 100px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        align-items: center;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    /* ---- BUTTONS ---- */
+    .btn {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.95rem;
+        min-height: 48px;
+    }
+
+    .btn-large {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        font-size: 1rem;
+    }
+
+    /* ---- CARDS ---- */
+    .card-image {
+        height: 160px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .card-price {
+        font-size: 1.25rem;
+    }
+
+    /* ---- GRIDS ---- */
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    /* ---- FOOTER ---- */
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-md);
+    }
+
+    /* ---- WHATSAPP FLOAT ---- */
+    .whatsapp-float {
+        bottom: 16px;
+        right: 16px;
+        width: 52px;
+        height: 52px;
+    }
+
+    /* ---- ORDER PAGE (pedido.html) ---- */
+    .order-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .order-summary-sticky {
+        position: static !important;
+    }
+
+    /* ---- CATEGORY TABS (cardápio) ---- */
+    .category-tabs {
+        padding: var(--spacing-sm) 0;
+        gap: var(--spacing-xs);
+    }
+
+    .category-tab {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+}
+
+/* =====================================================
+   MOBILE (até 480px)
+   ===================================================== */
+@media (max-width: 480px) {
+
+    /* ---- GERAL ---- */
+    :root {
+        --spacing-xl: 2rem;
+        --spacing-2xl: 2.5rem;
+    }
+
+    .container {
+        padding: 0 12px;
+    }
+
+    .section {
+        padding: var(--spacing-lg) 0;
+    }
+
+    /* ---- TIPOGRAFIA ---- */
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.2rem;
+    }
+
+    .section-title h2 {
+        font-size: 1.4rem;
+    }
+
+    /* ---- HERO ---- */
+    .hero {
+        padding: 90px 12px var(--spacing-lg);
+    }
+
+    .hero-banner {
+        padding: var(--spacing-sm);
+    }
+
+    .hero-banner-text {
+        font-size: 0.9rem;
+    }
+
+    /* ---- CARDS ---- */
+    .card {
+        padding: var(--spacing-sm);
+    }
+
+    .card-image {
+        height: 150px;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .card-price {
+        font-size: 1.1rem;
+    }
+
+    /* Botão no card vai para nova linha em telas muito pequenas */
+    .card>div:last-child {
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+
+    /* ---- GRIDS ---- */
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+
+    /* ---- FOOTER ---- */
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+
+    /* ---- FORM COMPONENTS ---- */
+    .form-group {
+        margin-bottom: var(--spacing-sm);
+    }
+
+    /* ---- PAGE HEADER ---- */
+    .page-header {
+        padding: 100px 12px var(--spacing-md) !important;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+/* =====================================================
+   ADMIN PANEL - MOBILE COMPLETO
+   ===================================================== */
+@media (max-width: 768px) {
+
+    /* ---- ADMIN SIDEBAR / TABS ---- */
+    .admin-container {
+        flex-direction: column !important;
+    }
+
+    .admin-sidebar {
+        width: 100% !important;
+        height: auto !important;
+        position: static !important;
+        overflow: visible !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+        padding: var(--spacing-sm) !important;
+        border-bottom: 2px solid var(--light-gray) !important;
+        border-right: none !important;
+    }
+
+    .admin-nav-item {
+        flex: 1 1 auto !important;
+        min-width: 80px !important;
+        text-align: center !important;
+        flex-direction: column !important;
+        padding: 8px 6px !important;
+        font-size: 0.78rem !important;
+        gap: 4px !important;
+        border-radius: var(--radius-sm) !important;
+    }
+
+    .admin-nav-item i {
+        font-size: 1.1rem !important;
+        margin: 0 !important;
+    }
+
+    .admin-content {
+        padding: var(--spacing-sm) !important;
+    }
+
+    .admin-main {
+        padding: var(--spacing-sm) !important;
+    }
+
+    /* ---- ADMIN HEADER ---- */
+    .admin-header {
+        padding: var(--spacing-sm) !important;
+        flex-wrap: wrap !important;
+        gap: var(--spacing-xs) !important;
+    }
+
+    .admin-header h1 {
+        font-size: 1.3rem !important;
+    }
+
+    /* ---- ADMIN PRODUCT TABLE ---- */
+    .products-table {
+        display: block !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .products-table th,
+    .products-table td {
+        min-width: 100px;
+        font-size: 0.82rem;
+        padding: 8px !important;
+    }
+
+    /* ---- ADMIN STATS CARDS ---- */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: var(--spacing-sm) !important;
+    }
+
+    .stat-card {
+        padding: var(--spacing-sm) !important;
+    }
+
+    .stat-value {
+        font-size: 1.5rem !important;
+    }
+
+    /* ---- ADMIN MODAIS ---- */
+    .modal-overlay,
+    .product-modal-overlay {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    .modal,
+    .product-modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        margin: 0 !important;
+    }
+
+    .product-modal {
+        align-items: flex-end !important;
+    }
+
+    /* ---- ADMIN FORMULÁRIOS ---- */
+    .form-row {
+        flex-direction: column !important;
+        gap: var(--spacing-sm) !important;
+    }
+
+    .form-col {
+        width: 100% !important;
+    }
+
+    /* ---- ADMIN ORDERS ---- */
+    .orders-toolbar {
+        flex-direction: column !important;
+        gap: var(--spacing-sm) !important;
+    }
+
+    .orders-filters {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+    }
+
+    .order-filter-btn {
+        font-size: 0.8rem !important;
+        padding: 6px 10px !important;
+    }
+
+    .order-card {
+        padding: var(--spacing-sm) !important;
+    }
+
+    .order-actions {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+    }
+
+    .order-actions .btn,
+    .order-actions button {
+        font-size: 0.8rem !important;
+        padding: 6px 12px !important;
+        min-height: 36px !important;
+    }
+
+    /* ---- ADMIN CONFIG FORM ---- */
+    .config-form .form-group {
+        margin-bottom: var(--spacing-sm) !important;
+    }
+
+    .config-actions {
+        flex-direction: column !important;
+        gap: var(--spacing-sm) !important;
+    }
+
+    .config-actions .btn {
+        width: 100% !important;
+        text-align: center !important;
+    }
+
+    /* ---- IMAGE UPLOAD AREA ---- */
+    #image-upload-area {
+        min-height: 140px !important;
+    }
+
+    /* ---- DELIVERY FEES TABLE ---- */
+    .delivery-table {
+        font-size: 0.85rem !important;
+    }
+
+    /* ---- COUPONS ---- */
+    .coupon-card {
+        padding: var(--spacing-sm) !important;
+    }
+
+    .coupon-actions {
+        flex-wrap: wrap !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* ---- ADMIN SIDEBAR ULTRA PEQUENO ---- */
+    .admin-nav-item span:not(.nav-label) {
+        display: none !important;
+    }
+
+    .admin-nav-item {
+        min-width: 52px !important;
+        padding: 8px 4px !important;
+    }
+
+    /* ---- STATS 2x2 ---- */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* ---- BOTÕES DO ADMIN ---- */
+    .admin-header .btn {
+        font-size: 0.82rem !important;
+        padding: var(--spacing-xs) var(--spacing-sm) !important;
+    }
+}
+
+/* =====================================================
+   PEDIDO.HTML MOBILE
+   ===================================================== */
+@media (max-width: 768px) {
+
+    /* Layout de duas colunas vira coluna única */
+    .checkout-layout,
+    div.grid.grid-2 {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    /* Botões de tipo de entrega */
+    .delivery-type-buttons {
+        flex-direction: column !important;
+        gap: var(--spacing-sm) !important;
+    }
+
+    .delivery-type-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Resumo do pedido */
+    .cart-summary {
+        position: static !important;
+        order: -1 !important;
+    }
+
+    /* Campos de form em tela pequena */
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    input[type="number"],
+    select,
+    textarea {
+        font-size: 16px !important;
+        /* Evita zoom no iOS */
+    }
+}
+
+/* =====================================================
+   PEDIDO.HTML - cards de produto no carrinho
+   ===================================================== */
+@media (max-width: 480px) {
+    .product-card-mini {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .product-quantity-controls {
+        margin-top: 8px;
+        width: 100%;
+        justify-content: space-between !important;
+    }
+}
+
+/* =====================================================
+   TOAST NOTIFICATIONS
+   ===================================================== */
+@media (max-width: 480px) {
+    .toast-container {
+        left: 12px !important;
+        right: 12px !important;
+        bottom: 12px !important;
+        top: auto !important;
+    }
+
+    .toast {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
