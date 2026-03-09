@@ -1,5 +1,5 @@
-// ============================================
-// SISTEMA DE DADOS - UAI PIZZARIA & DOCERIA
+﻿// ============================================
+// SISTEMA DE DADOS - UAI HAMBURGUERIA DO CHICO
 // ============================================
 
 // Cache em memória
@@ -132,12 +132,12 @@ function getFallbackData() {
             adminPassword: 'uai2024'
         },
         storeInfo: {
-            name: 'Uai Pizzaria & Doceria',
+            name: 'Uai Hamburgueria do Chico',
             address: 'Rua Alagoas, 70B – Cristo Redentor',
             addressComplement: 'Do lado do Hotel Mirian / atrás da rodoviária',
             phone: '(31) 99999-9999',
-            email: 'contato@uaipizzaria.com.br',
-            instagram: '@uaipizzaria',
+            email: 'contato@uaihamburgueriadochico.com.br',
+            instagram: '@uaihamburgueriadochico',
             hours: {
                 weekdays: 'Segunda a Sábado: 16:00 às 03:00',
                 sunday: 'Domingo: 20:00 às 03:00'

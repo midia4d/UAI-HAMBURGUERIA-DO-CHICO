@@ -1,5 +1,5 @@
 // ============================================================
-// RASTREIO DE PEDIDO — UAI PIZZARIA
+// RASTREIO DE PEDIDO — UAI HAMBURGUERIA DO CHICO
 // Busca o pedido pelo ID da URL e atualiza a cada 15s
 // ============================================================
 

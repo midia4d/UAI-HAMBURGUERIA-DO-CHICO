@@ -1,4 +1,4 @@
-// Sistema de administração
+﻿// Sistema de administração
 class AdminSystem {
     constructor() {
         this.data = getData();
@@ -52,7 +52,7 @@ class AdminSystem {
           <div style="text-align: center; margin-bottom: var(--spacing-xl);">
             <div style="font-size: 4rem; margin-bottom: var(--spacing-sm);"><i class="fa-solid fa-pizza-slice" style="color:var(--primary);"></i></div>
             <h1>Painel Admin</h1>
-            <p style="color: var(--gray);">Uai Pizzaria & Doceria</p>
+            <p style="color: var(--gray);">Uai Hamburgueria do Chico</p>
           </div>
           
           <form id="login-form">
@@ -762,7 +762,7 @@ class AdminSystem {
         const fullPhone = phone.startsWith('55') ? phone : '55' + phone;
 
         const messages = {
-            confirmed: `Olá ${name}! 🍕\n\nSeu pedido *#${orderId}* foi *confirmado* pela Uai Pizzaria & Doceria!\n\nEstamos preparando tudo com carinho para você. Em breve atualizaremos o status. 😊`,
+            confirmed: `Olá ${name}! 🍕\n\nSeu pedido *#${orderId}* foi *confirmado* pela Uai Hamburgueria do Chico!\n\nEstamos preparando tudo com carinho para você. Em breve atualizaremos o status. 😊`,
             preparing: `Olá ${name}! 👨‍🍳\n\nSeu pedido *#${orderId}* está *em preparo* agora!\n\nNossos pizzaiolos estão trabalhando nele. Tempo estimado: *30-40 minutos*. 🔥`,
             delivering: `Olá ${name}! 🛵\n\nSeu pedido *#${orderId}* *saiu para entrega!*\n\nNosso entregador está a caminho. Fique de olho! 📍`,
             completed: `Olá ${name}! ✅\n\nSeu pedido *#${orderId}* foi *entregue!*\n\nObrigado pela preferência! Esperamos que aproveite muito. 🍕❤️\n\nNos avalie no Google e volte sempre!`,
@@ -804,7 +804,7 @@ class AdminSystem {
         if (!order) return;
 
         const storeInfo = this.data?.storeInfo || {};
-        const storeName = storeInfo.name || 'Uai Pizzaria & Doceria';
+        const storeName = storeInfo.name || 'Uai Hamburgueria do Chico';
         const storeAddress = storeInfo.address || '';
         const storePhone = storeInfo.phone || '';
 
@@ -1292,7 +1292,7 @@ class AdminSystem {
 
             // Objeto StoreInfo
             const storeInfoData = {
-                name: 'Uai Pizzaria & Doceria', // Fixo por enquanto
+                name: 'Uai Hamburgueria do Chico', // Fixo por enquanto
                 address: document.getElementById('store-address').value,
                 address_complement: document.getElementById('store-complement').value,
                 phone: document.getElementById('store-phone').value,

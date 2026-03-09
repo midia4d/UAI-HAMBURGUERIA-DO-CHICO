@@ -1,5 +1,5 @@
-// ============================================
-// CLIENTE SUPABASE - UAI PIZZARIA & DOCERIA
+﻿// ============================================
+// CLIENTE SUPABASE - UAI HAMBURGUERIA DO CHICO
 // ============================================
 
 // Configuração do Supabase

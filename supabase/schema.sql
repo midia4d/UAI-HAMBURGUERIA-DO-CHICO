@@ -1,5 +1,5 @@
--- ============================================
--- SCHEMA DO BANCO DE DADOS - UAI PIZZARIA & DOCERIA
+﻿-- ============================================
+-- SCHEMA DO BANCO DE DADOS - UAI HAMBURGUERIA DO CHICO
 -- ============================================
 -- Execute este script no SQL Editor do Supabase
 -- URL: https://rsgzhywafuftizmpvuwy.supabase.co
@@ -259,12 +259,12 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO store_info (id, name, address, address_complement, phone, email, instagram, hours_weekdays, hours_sunday)
 VALUES (
     1,
-    'Uai Pizzaria & Doceria',
+    'Uai Hamburgueria do Chico',
     'Rua Alagoas, 70B – Cristo Redentor',
     'Do lado do Hotel Mirian / atrás da rodoviária',
     '(31) 99999-9999',
-    'contato@uaipizzaria.com.br',
-    '@uaipizzaria',
+    'contato@uaihamburgueriadochico.com.br',
+    '@uaihamburgueriadochico',
     'Segunda a Sábado: 16:00 às 03:00',
     'Domingo: 20:00 às 03:00'
 )

@@ -1,7 +1,7 @@
-{
-  "name": "Uai Pizzaria & Doceria",
-  "short_name": "Uai Pizzaria",
-  "description": "Pizzas artesanais e doces deliciosos. Delivery e retirada no local.",
+﻿{
+  "name": "Uai Hamburgueria do Chico",
+  "short_name": "Uai Hamburgueria do Chico",
+  "description": "Hambúrgueres artesanais e deliciosos. Delivery e retirada no local.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFF8F0",
