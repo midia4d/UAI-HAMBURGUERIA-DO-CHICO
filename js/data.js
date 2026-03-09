@@ -1,27 +1,61 @@
 // ============================================
 // SISTEMA DE DADOS - UAI PIZZARIA & DOCERIA
 // ============================================
-// IMPORTANTE: Este arquivo agora usa Supabase como banco de dados
-// Os dados não são mais armazenados no localStorage
 
-// Cache local para dados carregados
+// Cache em memória
 let cachedData = null;
 let dataLoadPromise = null;
+
+const CACHE_KEY = 'uai_data_cache';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
+
+// ============================================
+// CACHE NO LOCALSTORAGE (Stale-While-Revalidate)
+// ============================================
+
+function saveToLocalCache(data) {
+    try {
+        const payload = { data, ts: Date.now() };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
+    } catch (e) { /* Ignora erros de quota */ }
+}
+
+function loadFromLocalCache() {
+    try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const payload = JSON.parse(raw);
+        // Aceita cache mesmo "stale" para exibir conteúdo rápido
+        return payload.data || null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function isCacheStale() {
+    try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return true;
+        const payload = JSON.parse(raw);
+        return (Date.now() - payload.ts) > CACHE_TTL;
+    } catch (e) {
+        return true;
+    }
+}
 
 // ============================================
 // FUNÇÃO PRINCIPAL PARA OBTER DADOS
 // ============================================
 async function loadDataFromSupabase() {
     try {
-        // Verificar se dbManager está disponível
         if (typeof dbManager === 'undefined') {
-            console.error('❌ Cliente Supabase não carregado. Certifique-se de incluir supabase-client.js antes de data.js');
-            return getFallbackData();
+            console.error('❌ Cliente Supabase não carregado.');
+            return loadFromLocalCache() || getFallbackData();
         }
 
+        console.log('🔄 Carregando dados do Supabase...');
         const data = await dbManager.loadAllData();
 
-        // Formatar dados para compatibilidade com código existente
         cachedData = {
             categories: data.categories.map(c => ({
                 id: c.id,
@@ -36,39 +70,53 @@ async function loadDataFromSupabase() {
             messages: data.messages
         };
 
+        saveToLocalCache(cachedData);
+        console.log('✅ Dados carregados com sucesso!');
         return cachedData;
     } catch (error) {
         console.error('❌ Erro ao carregar dados do Supabase:', error);
-        return getFallbackData();
+        return loadFromLocalCache() || getFallbackData();
     }
 }
 
 // ============================================
 // FUNÇÃO SÍNCRONA COMPATÍVEL COM CÓDIGO EXISTENTE
-// Função para obter dados (compatibilidade com código existente)
+// ============================================
 function getData() {
-    // Se já tem cache, retorna
-    if (cachedData) {
+    // Se tem cache em memória, retorna imediatamente
+    if (cachedData) return cachedData;
+
+    // Se tem cache no localStorage, retorna ele imediatamente
+    const localCache = loadFromLocalCache();
+    if (localCache) {
+        cachedData = localCache;
+        // Atualiza em background se o cache estiver stale (>5min)
+        if (isCacheStale() && !dataLoadPromise) {
+            dataLoadPromise = loadDataFromSupabase().then(fresh => {
+                cachedData = fresh;
+                window.dispatchEvent(new CustomEvent('dataLoaded', { detail: fresh }));
+            });
+        }
         return cachedData;
     }
 
-    // Se ainda não iniciou o carregamento, inicia
+    // Sem cache nenhum – inicia carregamento
     if (!dataLoadPromise) {
         dataLoadPromise = loadDataFromSupabase();
     }
-
-    // Retorna dados de fallback enquanto carrega
     return getFallbackData();
 }
 
-// Função para forçar recarregamento dos dados (limpa cache)
+// Força recarregamento (chamado pelo admin após salvar)
 async function refreshData() {
     console.log('🔄 Forçando recarregamento dos dados...');
     dbManager.clearCache();
     cachedData = null;
     dataLoadPromise = null;
+    localStorage.removeItem(CACHE_KEY);
     return await loadDataFromSupabase();
 }
+
 
 // ============================================
 // DADOS DE FALLBACK (caso Supabase não esteja disponível)
