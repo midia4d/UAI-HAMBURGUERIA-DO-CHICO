@@ -12,12 +12,30 @@
     <link rel="icon" type="image/png" href="images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet">
+    </noscript>
+
+    <!-- Perf Optimization: Preload Critical CSS -->
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="css/mobile.css" as="style">
+
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/mobile.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- FontAwesome non-blocking -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    </noscript>
     <style>
         .page-header {
             background: var(--gradient-primary);
@@ -242,7 +260,8 @@
                     </h2>
 
                     <p style="font-size: 1.125rem; line-height: 1.8;">
-                        Na <strong>Uai Hamburgueria do Chico</strong>, acreditamos que toda história de amor merece um bom
+                        Na <strong>Uai Hamburgueria do Chico</strong>, acreditamos que toda história de amor merece um
+                        bom
                         começo.
                         Por isso, preparamos cada pizza e doce com muito carinho e ingredientes de qualidade.
                     </p>

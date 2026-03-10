@@ -453,15 +453,15 @@ class SupabaseDataManager {
 
     async getOrderById(orderId) {
         try {
-            // Em vez de consultar a tabela diretamente (bloqueada por RLS público), 
-            // usa RPC com SECURITY DEFINER para ler um pedido específico
             const { data, error } = await supabaseClient
-                .rpc('get_order_tracking', { p_order_id: orderId });
+                .from('orders')
+                .select('*')
+                .eq('id', orderId)
+                .single();
 
             if (error) throw error;
 
-            // Retorna o primeiro index do array retornado (como .single() faria)
-            return { success: true, data: data && data.length > 0 ? data[0] : null };
+            return { success: true, data };
         } catch (error) {
             console.error('Erro ao buscar pedido por ID:', error);
             return { success: false, error: error.message };

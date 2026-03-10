@@ -9,14 +9,33 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet">
+    </noscript>
+
+    <!-- Perf Optimization: Preload Critical CSS -->
+    <link rel="preload" href="css/styles.css" as="style">
+    <link rel="preload" href="css/admin.css" as="style">
+    <link rel="preload" href="css/mobile.css" as="style">
+
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/admin.css">
-    <link rel="stylesheet" href="css/admin-modal.css">
+    <link rel="stylesheet" href="css/admin-modal.css" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="css/mobile.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- FontAwesome non-blocking -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    </noscript>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -641,15 +660,11 @@
 
                 <h3 style="margin-top: var(--spacing-lg);">Segurança</h3>
                 <div class="form-group">
-                    <div
-                        style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: var(--spacing-md); color: #475569; font-size: 0.9rem;">
-                        <i class="fa-solid fa-shield-halved" style="color: #3b82f6; margin-right: 8px;"></i>
-                        <strong>Segurança Ativada:</strong> O gerenciamento de credenciais (e-mail e senha) agora é
-                        protegido criptograficamente pelo <a
-                            href="https://supabase.com/dashboard/project/rsgzhywafuftizmpvuwy/auth/users"
-                            target="_blank" style="color:#2563eb; text-decoration:underline;">Supabase Auth</a>. Para
-                        alterar seu acesso, utilize o painel oficial do banco de dados.
-                    </div>
+                    <label class="form-label">Senha do Admin</label>
+                    <input type="password" id="admin-password-input" class="form-input">
+                    <p style="font-size: 0.875rem; color: var(--gray); margin-top: var(--spacing-xs);">
+                        Altere a senha padrão para maior segurança
+                    </p>
                 </div>
 
                 <button class="btn btn-success btn-large" onclick="adminSystem.saveSettings()">
