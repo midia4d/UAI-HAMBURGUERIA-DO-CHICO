@@ -143,19 +143,6 @@ p {
   font-size: clamp(1rem, 2vw, 1.125rem);
 }
 
-/* ANTI-CLS: Placeholder para os ícones FontAwesome carregarem async sem piscarem */
-.fa,
-.fas,
-.fa-solid,
-.far,
-.fa-regular,
-.fab,
-.fa-brands {
-  display: inline-block;
-  width: 1em;
-  text-align: center;
-}
-
 .text-gradient {
   background: var(--gradient-primary);
   -webkit-background-clip: text;
