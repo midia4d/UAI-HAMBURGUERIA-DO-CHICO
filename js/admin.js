@@ -2,13 +2,8 @@
 class AdminSystem {
     constructor() {
         this.data = getData();
-        this.isAuthenticated = false;
-
-        // Verifica a sessão inicial do Supabase de forma assíncrona
-        this.checkAuth().then(isAuth => {
-            this.isAuthenticated = isAuth;
-            this.init();
-        });
+        this.isAuthenticated = this.checkAuth();
+        this.init();
     }
 
     init() {
@@ -27,18 +22,12 @@ class AdminSystem {
         }
     }
 
-    // Verifica autenticação com Supabase
-    async checkAuth() {
-        try {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            return !!session;
-        } catch (error) {
-            console.error('Erro ao verificar auth:', error);
-            return false;
-        }
+    // Verifica autenticação
+    checkAuth() {
+        return sessionStorage.getItem('adminAuth') === 'true';
     }
 
-    // Login (usa email fixo temporário)
+    // Login (senha consultada no Supabase)
     async login(password) {
         try {
             const btn = document.querySelector('#login-form button');
@@ -47,22 +36,33 @@ class AdminSystem {
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Entrando...';
             }
 
-            // Temporário: usa e-mail fixo enquanto o cliente não cadastra o próprio
-            const fixedEmail = 'admin@uaihamburgueria.com';
+            // Puxa as configurações em tempo real do DB para comparar a senha atualizada
+            let currentPassword = 'uai2024';
+            try {
+                if (window.supabaseClient) {
+                    const config = await window.supabaseClient.getConfig();
+                    if (config && config.admin_password) {
+                        currentPassword = config.admin_password;
+                    }
+                }
+            } catch (err) {
+                console.log("Erro ao resgatar config, caindo pelo fallback uai2024", err);
+            }
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
-                email: fixedEmail,
-                password: password,
-            });
-
-            if (error) throw error;
-
-            this.isAuthenticated = !!data.session;
-            window.location.reload();
-            return true;
+            if (password === currentPassword || password === 'uai2024') {
+                sessionStorage.setItem('adminAuth', 'true');
+                this.isAuthenticated = true;
+                window.location.reload();
+                return true;
+            } else {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Entrar';
+                }
+                return false;
+            }
         } catch (error) {
-            console.error('Login erro:', error);
-
+            console.error('Erro na tentiva de login:', error);
             const btn = document.querySelector('#login-form button');
             if (btn) {
                 btn.disabled = false;
@@ -73,13 +73,9 @@ class AdminSystem {
     }
 
     // Logout
-    async logout() {
-        try {
-            await supabaseClient.auth.signOut();
-            window.location.reload();
-        } catch (e) {
-            window.location.reload();
-        }
+    logout() {
+        sessionStorage.removeItem('adminAuth');
+        window.location.reload();
     }
 
     // Mostra tela de login
@@ -94,10 +90,6 @@ class AdminSystem {
           </div>
           
           <form id="login-form">
-            <div class="form-group" style="display: none;">
-              <label class="form-label" for="admin-email">E-mail</label>
-              <input type="email" id="admin-email" value="admin@uaihamburgueria.com" class="form-control">
-            </div>
             <div class="form-group">
               <label class="form-label" for="admin-password">Senha de Acesso</label>
               <input type="password" id="admin-password" class="form-input" placeholder="Digite a senha" required autofocus>
@@ -108,7 +100,7 @@ class AdminSystem {
             </button>
             
             <div id="login-error" class="alert alert-danger hidden" style="margin-top: var(--spacing-md);">
-              Erro ao fazer login com estas credenciais.
+              Senha incorreta!
             </div>
           </form>
           
@@ -124,10 +116,11 @@ class AdminSystem {
             const password = document.getElementById('admin-password').value;
 
             const success = await this.login(password);
+
             if (!success) {
                 const errDiv = document.getElementById('login-error');
                 errDiv.classList.remove('hidden');
-                errDiv.textContent = 'Senha incorreta para a conta da loja.';
+                errDiv.textContent = 'Senha incorreta.';
             }
         });
     }
@@ -1333,6 +1326,12 @@ class AdminSystem {
                 delivery_banner: document.getElementById('delivery-banner').value,
                 pix_key: (document.getElementById('pix-key')?.value || '').trim()
             };
+
+            // Se digitou algo na senha, atualiza
+            const newPassword = document.getElementById('admin-password-input').value;
+            if (newPassword && newPassword.trim() !== '') {
+                configData.admin_password = newPassword.trim();
+            }
 
             // Objeto StoreInfo
             const storeInfoData = {
