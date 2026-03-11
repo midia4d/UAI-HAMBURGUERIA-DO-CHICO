@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -24,7 +24,6 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/toast.css">
     <link rel="stylesheet" href="css/mobile.css">
-    <link rel="stylesheet" href="css/admin-modal.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
@@ -540,36 +539,6 @@
                 d="M23.14 19.47c-.39-.195-2.31-1.14-2.67-1.27-.36-.13-.62-.195-.88.195-.26.39-1.01 1.27-1.24 1.53-.23.26-.46.29-.85.1-.39-.195-1.645-.606-3.133-1.933-1.158-1.033-1.94-2.31-2.168-2.7-.228-.39-.024-.6.17-.795.175-.175.39-.455.585-.683.195-.228.26-.39.39-.65.13-.26.065-.487-.033-.683-.098-.195-.88-2.12-1.205-2.9-.317-.76-.64-.657-.88-.67-.228-.013-.487-.016-.747-.016s-.683.098-1.04.487c-.357.39-1.363 1.333-1.363 3.25s1.396 3.77 1.59 4.03c.195.26 2.745 4.19 6.65 5.875.93.402 1.656.642 2.222.822.934.297 1.785.255 2.458.155.75-.112 2.31-.944 2.635-1.856.325-.912.325-1.694.228-1.856-.098-.162-.358-.26-.748-.455z" />
         </svg>
     </a>
-
-    <!-- Modal de Seleção de Adicionais (Checkout) -->
-    <div id="addon-selection-modal" class="product-modal">
-        <div class="modal-content" style="max-width: 450px; width: 90%;">
-            <div class="modal-header" style="border-bottom: 1px solid var(--light-gray); padding-bottom: 10px;">
-                <h2 style="font-size: 1.25rem;"><i class="fa-solid fa-plus-circle"></i> Deseja turbinar o pedido?</h2>
-                <button class="modal-close" onclick="orderSystem.closeAddonSelectionModal()">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            <div class="modal-body" style="padding: 15px 0;">
-                <p style="font-size: 0.9rem; color: var(--gray); margin-bottom: 15px;">
-                    Personalize o <strong id="addon-product-name">Produto</strong> com os nossos deliciosos adicionais:
-                </p>
-                
-                <div id="addon-selection-list" style="display: flex; flex-direction: column; gap: 10px;">
-                    <!-- Adicionais renderizados pelo JS -->
-                </div>
-            </div>
-            
-            <div class="modal-footer" style="padding-top: 15px; border-top: 1px solid var(--light-gray); display: flex; gap: 10px;">
-                <button class="btn btn-secondary" style="flex: 1;" onclick="orderSystem.confirmAddons(true)">
-                    Não, Obrigado
-                </button>
-                <button class="btn btn-primary" style="flex: 2;" onclick="orderSystem.confirmAddons()">
-                    Adicionar Tudo
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

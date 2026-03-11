@@ -1,4 +1,4 @@
-// Sistema de administração
+﻿// Sistema de administração
 class AdminSystem {
     constructor() {
         this.data = getData();
@@ -186,9 +186,6 @@ class AdminSystem {
                 break;
             case 'history':
                 this.loadHistory();
-                break;
-            case 'addons':
-                this.loadAddons();
                 break;
         }
     }
@@ -505,12 +502,7 @@ class AdminSystem {
         document.getElementById('whatsapp-number').value = this.data.config.whatsappNumber;
         document.getElementById('free-delivery-min').value = this.data.config.freeDeliveryMinimum;
         document.getElementById('delivery-time').value = this.data.config.estimatedDeliveryTime;
-        
-        // Deixar a senha em branco para que só altere intencionalmente
-        document.getElementById('admin-password-input').value = '';
-        
-        const pixKeyInput = document.getElementById('pix-key');
-        if (pixKeyInput) pixKeyInput.value = this.data.config.pixKey || '';
+        document.getElementById('admin-password-input').value = this.data.config.adminPassword;
 
         // Mensagens
         document.getElementById('welcome-message').value = this.data.config.welcomeMessage || '';
@@ -524,96 +516,93 @@ class AdminSystem {
         document.getElementById('store-complement').value = this.data.storeInfo.addressComplement;
     }
 
-    // Carrega taxas de entrega do Supabase
-    async loadDeliveryFees() {
-        const tbody = document.getElementById('delivery-fees-table-body');
-        if (!tbody) return;
+    // Salva configurações
+    async saveSettings() {
+        // Atualizar dados locais
+        this.data.config.sitePaused = document.getElementById('site-paused').checked;
+        this.data.config.ordersEnabled = document.getElementById('orders-enabled').checked;
+        this.data.config.whatsappNumber = document.getElementById('whatsapp-number').value;
+        this.data.config.freeDeliveryMinimum = parseFloat(document.getElementById('free-delivery-min').value);
+        this.data.config.estimatedDeliveryTime = document.getElementById('delivery-time').value;
+        this.data.config.adminPassword = document.getElementById('admin-password-input').value;
 
-        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--gray);">Carregando...</td></tr>';
+        this.data.config.welcomeMessage = document.getElementById('welcome-message').value;
+        this.data.config.tagline = document.getElementById('tagline').value;
+        this.data.config.deliveryBanner = document.getElementById('delivery-banner').value;
 
+        this.data.storeInfo.phone = document.getElementById('store-phone').value;
+        this.data.storeInfo.instagram = document.getElementById('store-instagram').value;
+        this.data.storeInfo.address = document.getElementById('store-address').value;
+        this.data.storeInfo.addressComplement = document.getElementById('store-complement').value;
+
+        // Salvar no Supabase
         try {
-            const fees = await dbManager.getDeliveryFees(true);
-            this.data.deliveryFees = fees;
+            await saveData(this.data);
 
-            if (fees.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--gray);">Nenhuma taxa cadastrada.</td></tr>';
-                return;
-            }
+            // Limpar cache para forçar recarregamento
+            dbManager.clearCache();
+            cachedData = null;
 
-            tbody.innerHTML = fees.map(fee => `
-              <tr>
-                <td>${fee.neighborhood}</td>
-                <td>${app.formatPrice(fee.fee)}</td>
-                <td>
-                  <button class="btn btn-small btn-warning" onclick="adminSystem.editDeliveryFee('${fee.id}')">Editar</button>
-                  <button class="btn btn-small btn-danger" onclick="adminSystem.deleteDeliveryFee('${fee.id}', '${fee.neighborhood.replace(/'/g, "\\'")}')">Excluir</button>
-                </td>
-              </tr>
-            `).join('');
-        } catch (err) {
-            console.error('Erro ao carregar taxas:', err);
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: red;">Erro ao carregar taxas.</td></tr>';
+            this.showAlert('Configurações salvas com sucesso! As alterações aparecerão no site.', 'success');
+            this.loadDashboard();
+        } catch (error) {
+            this.showAlert('Erro ao salvar configurações: ' + error.message, 'danger');
         }
+    }
+
+    // Carrega taxas de entrega
+    loadDeliveryFees() {
+        const tbody = document.getElementById('delivery-fees-table-body');
+        tbody.innerHTML = this.data.deliveryFees.map((fee, index) => `
+      <tr>
+        <td>${fee.neighborhood}</td>
+        <td>${app.formatPrice(fee.fee)}</td>
+        <td>
+          <button class="btn btn-small btn-warning" onclick="adminSystem.editDeliveryFee(${index})">Editar</button>
+          <button class="btn btn-small btn-danger" onclick="adminSystem.deleteDeliveryFee(${index})">Excluir</button>
+        </td>
+      </tr>
+    `).join('');
     }
 
     // Adiciona taxa de entrega
-    async addDeliveryFee() {
+    addDeliveryFee() {
         const neighborhood = prompt('Nome do bairro:');
-        if (!neighborhood || !neighborhood.trim()) return;
+        if (!neighborhood) return;
 
-        const feeInput = prompt('Taxa de entrega (R$):');
-        if (feeInput === null) return;
-        const fee = parseFloat(feeInput.replace(',', '.'));
-        if (isNaN(fee) || fee < 0) {
-            this.showAlert('Valor inválido para a taxa.', 'danger');
-            return;
-        }
+        const fee = parseFloat(prompt('Taxa de entrega:'));
+        if (isNaN(fee)) return;
 
-        const result = await dbManager.addDeliveryFee(neighborhood.trim(), fee);
-        if (result.success) {
-            this.showAlert('Taxa adicionada com sucesso!', 'success');
-            this.loadDeliveryFees();
-        } else {
-            this.showAlert('Erro ao adicionar: ' + result.error, 'danger');
-        }
+        this.data.deliveryFees.push({ neighborhood, fee });
+        saveData(this.data);
+        this.loadDeliveryFees();
+        this.showAlert('Taxa adicionada com sucesso!', 'success');
     }
 
     // Edita taxa de entrega
-    async editDeliveryFee(id) {
-        const current = this.data.deliveryFees.find(f => String(f.id) === String(id));
-        if (!current) return;
+    editDeliveryFee(index) {
+        const deliveryFee = this.data.deliveryFees[index];
 
-        const neighborhood = prompt('Nome do bairro:', current.neighborhood);
-        if (!neighborhood || !neighborhood.trim()) return;
+        const neighborhood = prompt('Nome do bairro:', deliveryFee.neighborhood);
+        if (!neighborhood) return;
 
-        const feeInput = prompt('Taxa de entrega (R$):', current.fee);
-        if (feeInput === null) return;
-        const fee = parseFloat(feeInput.replace(',', '.'));
-        if (isNaN(fee) || fee < 0) {
-            this.showAlert('Valor inválido para a taxa.', 'danger');
-            return;
-        }
+        const fee = parseFloat(prompt('Taxa de entrega:', deliveryFee.fee));
+        if (isNaN(fee)) return;
 
-        const result = await dbManager.updateDeliveryFee(id, neighborhood.trim(), fee);
-        if (result.success) {
-            this.showAlert('Taxa atualizada com sucesso!', 'success');
-            this.loadDeliveryFees();
-        } else {
-            this.showAlert('Erro ao atualizar: ' + result.error, 'danger');
-        }
+        this.data.deliveryFees[index] = { neighborhood, fee };
+        saveData(this.data);
+        this.loadDeliveryFees();
+        this.showAlert('Taxa atualizada com sucesso!', 'success');
     }
 
     // Deleta taxa de entrega
-    async deleteDeliveryFee(id, neighborhood) {
-        if (!confirm(`Excluir a taxa para "${neighborhood}"?`)) return;
+    deleteDeliveryFee(index) {
+        if (!confirm('Tem certeza que deseja excluir esta taxa?')) return;
 
-        const result = await dbManager.deleteDeliveryFee(id);
-        if (result.success) {
-            this.showAlert('Taxa excluída com sucesso!', 'success');
-            this.loadDeliveryFees();
-        } else {
-            this.showAlert('Erro ao excluir: ' + result.error, 'danger');
-        }
+        this.data.deliveryFees.splice(index, 1);
+        saveData(this.data);
+        this.loadDeliveryFees();
+        this.showAlert('Taxa excluída com sucesso!', 'success');
     }
 
     // Exporta dados
@@ -1325,32 +1314,30 @@ class AdminSystem {
         }
 
         try {
-            // Objeto de Configuração MAIS ALINNHADO AO SUPABASE-CLIENT (camelCase)
+            // Objeto de Configuração
             const configData = {
-                sitePaused: document.getElementById('site-paused').checked,
-                ordersEnabled: document.getElementById('orders-enabled').checked,
-                whatsappNumber: document.getElementById('whatsapp-number').value.replace(/\D/g, ''),
-                freeDeliveryMinimum: parseFloat(document.getElementById('free-delivery-min').value) || 0,
-                estimatedDeliveryTime: document.getElementById('delivery-time').value,
-                welcomeMessage: document.getElementById('welcome-message').value,
+                site_paused: document.getElementById('site-paused').checked,
+                orders_enabled: document.getElementById('orders-enabled').checked,
+                whatsapp_number: document.getElementById('whatsapp-number').value.replace(/\D/g, ''),
+                free_delivery_minimum: parseFloat(document.getElementById('free-delivery-min').value) || 0,
+                estimated_delivery_time: document.getElementById('delivery-time').value,
+                welcome_message: document.getElementById('welcome-message').value,
                 tagline: document.getElementById('tagline').value,
-                deliveryBanner: document.getElementById('delivery-banner').value,
-                pixKey: (document.getElementById('pix-key')?.value || '').trim()
+                delivery_banner: document.getElementById('delivery-banner').value,
+                pix_key: (document.getElementById('pix-key')?.value || '').trim()
             };
 
-            // Se digitou algo na senha e ela for DIFERENTE da atual, envia ela
-            let passwordWasChanged = false;
+            // Se digitou algo na senha, atualiza
             const newPassword = document.getElementById('admin-password-input').value;
-            if (newPassword && newPassword.trim() !== '' && newPassword.trim() !== this.data.config.adminPassword) {
-                configData.adminPassword = newPassword.trim();
-                passwordWasChanged = true;
+            if (newPassword && newPassword.trim() !== '') {
+                configData.admin_password = newPassword.trim();
             }
 
             // Objeto StoreInfo
             const storeInfoData = {
                 name: 'Uai Hamburgueria do Chico', // Fixo por enquanto
                 address: document.getElementById('store-address').value,
-                addressComplement: document.getElementById('store-complement').value,
+                address_complement: document.getElementById('store-complement').value,
                 phone: document.getElementById('store-phone').value,
                 instagram: document.getElementById('store-instagram').value,
                 // Mantém os horários antigos se não houver edição no form
@@ -1367,16 +1354,13 @@ class AdminSystem {
                 // Força um recarregamento dos dados
                 await refreshData();
                 this.data = getData();
-                if (passwordWasChanged) {
+                if (newPassword && newPassword.trim() !== '') {
                     this.showAlert('Senha alterada. Você precisará logar novamente.', 'warning');
                     setTimeout(() => this.logout(), 2000);
                 }
             } else {
-                const erros = [];
-                if (!resConfig.success) erros.push('Config: ' + (resConfig.error || 'erro desconhecido'));
-                if (!resStore.success) erros.push('Loja: ' + (resStore.error || 'erro desconhecido'));
-                this.showAlert('Erro: ' + erros.join(' | '), 'danger');
-                console.error('Erros de salvamento:', resConfig, resStore);
+                this.showAlert('Erro ao salvar algumas configurações.', 'danger');
+                console.error('Erros de salvamento:', resConfig.error, resStore.error);
             }
         } catch (error) {
             console.error('Failed to save settings:', error);
@@ -1952,178 +1936,18 @@ AdminSystem.prototype.saveCategory = async function () {
 };
 
 AdminSystem.prototype.deleteCategory = async function (id, name) {
-    if (!confirm(`Tem certeza que deseja excluir a categoria "${name}"?\nTodos os produtos desta categoria ficarão sem categoria vinculada.`)) return;
+    if (!confirm(`Tem certeza que deseja excluir a categoria "${name}"?\n\nProdutos desta categoria ficarão sem categoria!`)) return;
 
     try {
-        const result = await dbManager.deleteCategory(id);
-        if (result.success) {
-            this.showAlert('Categoria excluída com sucesso!', 'success');
-            // Recarrega todos os dados
-            const freshData = await dbManager.loadAllData();
-            this.data = freshData;
-            // Atualiza global
-            if (typeof cachedData !== 'undefined') {
-                Object.assign(cachedData, freshData);
-            }
-            this.loadCategories();
-        } else {
-            this.showAlert('Erro ao excluir: ' + result.error, 'danger');
-        }
-    } catch (error) {
-        console.error('Erro ao excluir categoria:', error);
-        this.showAlert('Erro interno ao excluir categoria.', 'danger');
-    }
-};
-
-// ============================================
-// GESTÃO DE ADICIONAIS
-// ============================================
-
-AdminSystem.prototype.loadAddons = function () {
-    const tbody = document.getElementById('addons-table-body');
-    if (!tbody) return;
-
-    if (!this.data.addons || this.data.addons.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center">Nenhum adicional cadastrado.</td></tr>`;
-        return;
-    }
-
-    tbody.innerHTML = this.data.addons.map(addon => {
-        // Encontra o nome da categoria vinculada
-        let catName = 'Todas (Geral)';
-        if (addon.categoryId) {
-            const cat = this.data.categories.find(c => c.id === addon.categoryId);
-            if (cat) catName = cat.name;
-        }
-
-        return `
-        <tr>
-            <td><strong>${addon.name}</strong></td>
-            <td>${app.formatPrice(addon.price)}</td>
-            <td><span class="status-badge" style="background:#f3f4f6; color:#4b5563; border-color:#d1d5db;">${catName}</span></td>
-            <td>
-                <span class="status-badge ${addon.active ? 'status-active' : 'status-inactive'}">
-                    ${addon.active ? 'Ativo' : 'Inativo'}
-                </span>
-            </td>
-            <td>
-                <button class="btn btn-small btn-warning" onclick="adminSystem.openAddonModal('${addon.id}')">Editar</button>
-                <button class="btn btn-small btn-danger" onclick="adminSystem.deleteAddon('${addon.id}', '${addon.name.replace(/'/g, "\\'")}')">Excluir</button>
-            </td>
-        </tr>`;
-    }).join('');
-};
-
-AdminSystem.prototype.openAddonModal = function (addonId = null) {
-    document.getElementById('addon-form').reset();
-    document.getElementById('addon-edit-id').value = '';
-    
-    // Popula o select de categorias
-    const catSelect = document.getElementById('addon-category');
-    let optionsHtml = '<option value="">Todas as Categorias (Geral)</option>';
-    if (this.data.categories && this.data.categories.length > 0) {
-        this.data.categories.forEach(cat => {
-            optionsHtml += `<option value="${cat.id}">${cat.name}</option>`;
-        });
-    }
-    catSelect.innerHTML = optionsHtml;
-
-    if (addonId) {
-        const addon = this.data.addons.find(a => a.id === addonId);
-        if (addon) {
-            document.getElementById('addon-modal-title').innerHTML = '<i class="fa-solid fa-pen"></i> Editar Adicional';
-            document.getElementById('addon-edit-id').value = addon.id;
-            document.getElementById('addon-name').value = addon.name;
-            document.getElementById('addon-price').value = addon.price;
-            document.getElementById('addon-category').value = addon.categoryId || '';
-            document.getElementById('addon-active').checked = addon.active;
-        }
-    } else {
-        document.getElementById('addon-modal-title').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Novo Adicional';
-        document.getElementById('addon-active').checked = true;
-    }
-
-    document.getElementById('addon-modal').classList.add('active');
-};
-
-AdminSystem.prototype.closeAddonModal = function () {
-    document.getElementById('addon-modal').classList.remove('active');
-};
-
-AdminSystem.prototype.saveAddon = async function (e) {
-    e.preventDefault();
-
-    const id = document.getElementById('addon-edit-id').value;
-    const name = document.getElementById('addon-name').value.trim();
-    const priceStr = document.getElementById('addon-price').value;
-    const price = parseFloat(priceStr.replace(',', '.'));
-    const categoryId = document.getElementById('addon-category').value || null;
-    const active = document.getElementById('addon-active').checked;
-
-    if (!name || isNaN(price)) {
-        this.showAlert('Preencha os campos obrigatórios corretamente.', 'danger');
-        return;
-    }
-
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
-    submitBtn.disabled = true;
-
-    try {
-        const addonData = { name, price, categoryId, active };
-        let result;
-
-        if (id) {
-            result = await dbManager.updateAddon(id, addonData);
-        } else {
-            result = await dbManager.addAddon(addonData);
-        }
-
-        if (result.success) {
-            this.showAlert(`Adicional ${id ? 'atualizado' : 'criado'} com sucesso!`, 'success');
-            
-            // Recarrega todos os dados
-            const freshData = await dbManager.loadAllData();
-            this.data = freshData;
-            // Atualiza global
-            if (typeof cachedData !== 'undefined') {
-                Object.assign(cachedData, freshData);
-            }
-            
-            this.loadAddons();
-            this.closeAddonModal();
-        } else {
-            this.showAlert('Erro ao salvar adicional: ' + result.error, 'danger');
-        }
-    } catch (error) {
-        console.error('Erro geral ao salvar adicional:', error);
-        this.showAlert('Erro interno ao salvar adicional.', 'danger');
-    } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }
-};
-
-AdminSystem.prototype.deleteAddon = async function (id, name) {
-    if (!confirm(`Tem certeza que deseja excluir o adicional "${name}"?`)) return;
-
-    try {
-        const result = await dbManager.deleteAddon(id);
-        if (result.success) {
-            this.showAlert('Adicional excluído com sucesso!', 'success');
-            // Recarrega todos os dados
-            const freshData = await dbManager.loadAllData();
-            this.data = freshData;
-            if (typeof cachedData !== 'undefined') {
-                Object.assign(cachedData, freshData);
-            }
-            this.loadAddons();
-        } else {
-            this.showAlert('Erro ao excluir: ' + result.error, 'danger');
-        }
-    } catch (error) {
-        console.error('Erro ao excluir adicional:', error);
-        this.showAlert('Erro interno ao excluir adicional.', 'danger');
+        const { error } = await supabaseClient
+            .from('categories')
+            .delete()
+            .eq('id', id);
+        if (error) throw error;
+        this.loadCategories();
+        this.showToast('Categoria excluída!', 'success');
+    } catch (err) {
+        console.error('Erro ao excluir categoria:', err);
+        alert('Erro ao excluir: ' + err.message);
     }
 };
