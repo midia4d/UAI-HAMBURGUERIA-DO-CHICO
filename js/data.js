@@ -115,7 +115,10 @@ async function refreshData() {
     cachedData = null;
     dataLoadPromise = null;
     localStorage.removeItem(CACHE_KEY);
-    return await loadDataFromSupabase();
+    const fresh = await loadDataFromSupabase();
+    // Notifica todas as páginas abertas que os dados mudaram
+    window.dispatchEvent(new CustomEvent('dataLoaded', { detail: fresh }));
+    return fresh;
 }
 
 
@@ -194,11 +197,7 @@ async function saveData(data) {
     }
 }
 
-async function refreshData() {
-    cachedData = null;
-    dataLoadPromise = null;
-    return await loadDataFromSupabase();
-}
+// Removido: refreshData duplicado estava aqui e sobrescrevia a versão correta acima.
 
 // ============================================
 // INICIALIZAÇÃO

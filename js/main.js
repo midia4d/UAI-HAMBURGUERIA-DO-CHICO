@@ -11,6 +11,48 @@ class UaiPizzaria {
         this.initNavigation();
         this.initWhatsAppButton();
         this.initScrollAnimations();
+        this.applyConfig();
+    }
+
+    // Aplica configurações do banco nos elementos do HTML
+    applyConfig() {
+        const cfg = this.data.config || {};
+        const msg = this.data.messages || {};
+
+        // Tagline (subtítulo do hero)
+        const taglineEl = document.querySelector('.hero-subtitle, .hero-tagline, [data-tagline]');
+        if (taglineEl && (cfg.tagline || msg.tagline)) {
+            taglineEl.textContent = cfg.tagline || msg.tagline;
+        }
+
+        // Banner de entrega grátis
+        const bannerEl = document.querySelector('.hero-banner-text, [data-delivery-banner]');
+        if (bannerEl && (cfg.deliveryBanner || msg.deliveryBanner)) {
+            bannerEl.textContent = cfg.deliveryBanner || msg.deliveryBanner;
+        }
+
+        // Atualiza link do WhatsApp flutuante
+        const waFloat = document.querySelector('.whatsapp-float');
+        if (waFloat && cfg.whatsappNumber) {
+            waFloat.href = `https://wa.me/${cfg.whatsappNumber}`;
+        }
+
+        // Atualiza todos os links de WhatsApp na página
+        document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+            const url = link.href;
+            // Preserva o texto da mensagem se existir
+            const msgMatch = url.match(/\?text=(.+)/);
+            const textPart = msgMatch ? `?text=${msgMatch[1]}` : '';
+            link.href = `https://wa.me/${cfg.whatsappNumber}${textPart}`;
+        });
+
+        // Pausa de pedidos – oculta botão de pedir se desabilitado
+        if (cfg.ordersEnabled === false) {
+            document.querySelectorAll('.btn-primary[onclick*="pedido"]').forEach(btn => {
+                btn.disabled = true;
+                btn.title = 'Pedidos desabilitados no momento';
+            });
+        }
     }
 
     // Verifica se o site está pausado
