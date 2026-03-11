@@ -68,7 +68,13 @@ async function loadDataFromSupabase() {
             config: data.config,
             storeInfo: data.storeInfo,
             addons: data.addons,
-            messages: data.messages
+            // messages construído a partir dos campos da config no banco
+            messages: {
+                welcome: data.config?.welcomeMessage || 'Seja bem-vindo!',
+                tagline: data.config?.tagline || 'Porque toda história de amor merece um bom começo',
+                deliveryBanner: data.config?.deliveryBanner || 'Taxa de entrega GRÁTIS para pedidos acima de R$60,00',
+                closedMessage: 'Estamos fechados no momento. Volte em breve!'
+            }
         };
 
         saveToLocalCache(cachedData);

@@ -1314,17 +1314,17 @@ class AdminSystem {
         }
 
         try {
-            // Objeto de Configuração
+            // Objeto de Configuração — usa camelCase para bater com updateConfig()
             const configData = {
-                site_paused: document.getElementById('site-paused').checked,
-                orders_enabled: document.getElementById('orders-enabled').checked,
-                whatsapp_number: document.getElementById('whatsapp-number').value.replace(/\D/g, ''),
-                free_delivery_minimum: parseFloat(document.getElementById('free-delivery-min').value) || 0,
-                estimated_delivery_time: document.getElementById('delivery-time').value,
-                welcome_message: document.getElementById('welcome-message').value,
+                sitePaused: document.getElementById('site-paused').checked,
+                ordersEnabled: document.getElementById('orders-enabled').checked,
+                whatsappNumber: document.getElementById('whatsapp-number').value.replace(/\D/g, ''),
+                freeDeliveryMinimum: parseFloat(document.getElementById('free-delivery-min').value) || 0,
+                estimatedDeliveryTime: document.getElementById('delivery-time').value,
+                welcomeMessage: document.getElementById('welcome-message').value,
                 tagline: document.getElementById('tagline').value,
-                delivery_banner: document.getElementById('delivery-banner').value,
-                pix_key: (document.getElementById('pix-key')?.value || '').trim()
+                deliveryBanner: document.getElementById('delivery-banner').value,
+                pixKey: (document.getElementById('pix-key')?.value || '').trim()
             };
 
             // Se digitou algo na senha E é diferente da atual, atualiza
