@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // CLIENTE SUPABASE - UAI HAMBURGUERIA DO CHICO
 // ============================================
 
@@ -266,6 +266,105 @@ class SupabaseDataManager {
     }
 
     // ============================================
+    // ADICIONAIS (ADD-ONS)
+    // ============================================
+
+    async getAddons(forceRefresh = false) {
+        if (!forceRefresh && this.cache.addons && this.isCacheValid()) {
+            return this.cache.addons;
+        }
+
+        try {
+            const { data, error } = await supabaseClient
+                .from('addons')
+                .select('*')
+                .order('name', { ascending: true });
+
+            if (error) throw error;
+
+            const formattedAddons = data.map(a => ({
+                id: a.id,
+                name: a.name,
+                price: parseFloat(a.price),
+                categoryId: a.category_id,
+                active: a.active
+            }));
+
+            this.cache.addons = formattedAddons;
+            this.cache.lastUpdate = Date.now();
+            return formattedAddons;
+        } catch (error) {
+            console.error('Erro ao buscar adicionais:', error);
+            return this.cache.addons || [];
+        }
+    }
+
+    async addAddon(addon) {
+        try {
+            const dbAddon = {
+                name: addon.name,
+                price: addon.price,
+                category_id: addon.categoryId || null,
+                active: addon.active !== undefined ? addon.active : true
+            };
+
+            const { data, error } = await supabaseClient
+                .from('addons')
+                .insert([dbAddon])
+                .select();
+
+            if (error) throw error;
+
+            this.clearCache();
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('Erro ao adicionar extra/adicional:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async updateAddon(id, addon) {
+        try {
+            const dbUpdates = {};
+            if (addon.name !== undefined) dbUpdates.name = addon.name;
+            if (addon.price !== undefined) dbUpdates.price = addon.price;
+            if (addon.categoryId !== undefined) dbUpdates.category_id = addon.categoryId || null;
+            if (addon.active !== undefined) dbUpdates.active = addon.active;
+
+            const { data, error } = await supabaseClient
+                .from('addons')
+                .update(dbUpdates)
+                .eq('id', id)
+                .select();
+
+            if (error) throw error;
+
+            this.clearCache();
+            return { success: true, data: data[0] };
+        } catch (error) {
+            console.error('Erro ao atualizar adicional:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    async deleteAddon(id) {
+        try {
+            const { error } = await supabaseClient
+                .from('addons')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            this.clearCache();
+            return { success: true };
+        } catch (error) {
+            console.error('Erro ao deletar adicional:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // ============================================
     // CONFIGURAÇÕES
     // ============================================
 
@@ -292,7 +391,8 @@ class SupabaseDataManager {
                 adminPassword: data.admin_password,
                 welcomeMessage: data.welcome_message,
                 tagline: data.tagline,
-                deliveryBanner: data.delivery_banner
+                deliveryBanner: data.delivery_banner,
+                pixKey: data.pix_key
             };
 
             this.cache.config = formattedConfig;
@@ -316,6 +416,9 @@ class SupabaseDataManager {
             if (updates.welcomeMessage !== undefined) dbUpdates.welcome_message = updates.welcomeMessage;
             if (updates.tagline !== undefined) dbUpdates.tagline = updates.tagline;
             if (updates.deliveryBanner !== undefined) dbUpdates.delivery_banner = updates.deliveryBanner;
+            if (updates.pixKey !== undefined) dbUpdates.pix_key = updates.pixKey;
+
+            if (Object.keys(dbUpdates).length === 0) return { success: true };
 
             const { data, error } = await supabaseClient
                 .from('config')
@@ -326,7 +429,7 @@ class SupabaseDataManager {
             if (error) throw error;
 
             this.clearCache();
-            return { success: true, data: data[0] };
+            return { success: true, data: data?.[0] };
         } catch (error) {
             console.error('Erro ao atualizar configurações:', error);
             return { success: false, error: error.message };
@@ -378,12 +481,19 @@ class SupabaseDataManager {
             const dbUpdates = {};
             if (updates.name !== undefined) dbUpdates.name = updates.name;
             if (updates.address !== undefined) dbUpdates.address = updates.address;
+            // Aceita tanto camelCase quanto snake_case
             if (updates.addressComplement !== undefined) dbUpdates.address_complement = updates.addressComplement;
+            if (updates.address_complement !== undefined) dbUpdates.address_complement = updates.address_complement;
             if (updates.phone !== undefined) dbUpdates.phone = updates.phone;
             if (updates.email !== undefined) dbUpdates.email = updates.email;
             if (updates.instagram !== undefined) dbUpdates.instagram = updates.instagram;
+            // Aceita tanto aninhado (hours.weekdays) quanto flat (hours_weekdays)
             if (updates.hours?.weekdays !== undefined) dbUpdates.hours_weekdays = updates.hours.weekdays;
             if (updates.hours?.sunday !== undefined) dbUpdates.hours_sunday = updates.hours.sunday;
+            if (updates.hours_weekdays !== undefined) dbUpdates.hours_weekdays = updates.hours_weekdays;
+            if (updates.hours_sunday !== undefined) dbUpdates.hours_sunday = updates.hours_sunday;
+
+            if (Object.keys(dbUpdates).length === 0) return { success: true };
 
             const { data, error } = await supabaseClient
                 .from('store_info')
@@ -394,7 +504,7 @@ class SupabaseDataManager {
             if (error) throw error;
 
             this.clearCache();
-            return { success: true, data: data[0] };
+            return { success: true, data: data?.[0] };
         } catch (error) {
             console.error('Erro ao atualizar informações da loja:', error);
             return { success: false, error: error.message };
@@ -630,12 +740,13 @@ class SupabaseDataManager {
 
     async loadAllData() {
         try {
-            const [categories, products, deliveryFees, config, storeInfo] = await Promise.all([
+            const [categories, products, deliveryFees, config, storeInfo, addons] = await Promise.all([
                 this.getCategories(true),
                 this.getProducts(true),
                 this.getDeliveryFees(true),
                 this.getConfig(true),
-                this.getStoreInfo(true)
+                this.getStoreInfo(true),
+                this.getAddons(true)
             ]);
 
             return {
@@ -644,6 +755,7 @@ class SupabaseDataManager {
                 deliveryFees,
                 config,
                 storeInfo,
+                addons,
                 messages: {
                     welcome: config.welcomeMessage,
                     tagline: config.tagline,

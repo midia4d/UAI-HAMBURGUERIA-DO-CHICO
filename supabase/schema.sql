@@ -1,4 +1,4 @@
-﻿-- ============================================
+-- ============================================
 -- SCHEMA DO BANCO DE DADOS - UAI HAMBURGUERIA DO CHICO
 -- ============================================
 -- Execute este script no SQL Editor do Supabase
@@ -36,6 +36,19 @@ CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_available ON products(available);
 
 -- ============================================
+-- 3\5. TABELA DE ADICIONAIS (ADD-ONS)
+-- ============================================
+CREATE TABLE IF NOT EXISTS addons (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+    active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- ============================================
 -- 3. TABELA DE TAXAS DE ENTREGA
 -- ============================================
 CREATE TABLE IF NOT EXISTS delivery_fees (
@@ -60,6 +73,7 @@ CREATE TABLE IF NOT EXISTS config (
     welcome_message TEXT,
     tagline TEXT,
     delivery_banner TEXT,
+    pix_key TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     CONSTRAINT single_config CHECK (id = 1)
@@ -125,6 +139,10 @@ DROP TRIGGER IF EXISTS update_categories_updated_at ON categories;
 CREATE TRIGGER update_categories_updated_at BEFORE UPDATE ON categories
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_addons_updated_at ON addons;
+CREATE TRIGGER update_addons_updated_at BEFORE UPDATE ON addons
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 DROP TRIGGER IF EXISTS update_products_updated_at ON products;
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
@@ -153,6 +171,13 @@ CREATE TRIGGER update_orders_updated_at BEFORE UPDATE ON orders
 -- Habilitar RLS em todas as tabelas
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Acesso total aos produtos" ON products FOR ALL USING (true);
+
+-- Adicionais
+ALTER TABLE addons ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Acesso total aos adicionais" ON addons FOR ALL USING (true);
+
+-- Taxas de Entrega
 ALTER TABLE delivery_fees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE store_info ENABLE ROW LEVEL SECURITY;

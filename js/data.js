@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // SISTEMA DE DADOS - UAI HAMBURGUERIA DO CHICO
 // ============================================
 
@@ -67,6 +67,7 @@ async function loadDataFromSupabase() {
             deliveryFees: data.deliveryFees,
             config: data.config,
             storeInfo: data.storeInfo,
+            addons: data.addons,
             messages: data.messages
         };
 
@@ -162,7 +163,8 @@ function getFallbackData() {
             tagline: 'Porque toda história de amor merece um bom começo',
             deliveryBanner: 'Taxa de entrega GRÁTIS para pedidos acima de R$60,00',
             closedMessage: 'Estamos fechados no momento. Volte em breve!'
-        }
+        },
+        addons: []
     };
 }
 

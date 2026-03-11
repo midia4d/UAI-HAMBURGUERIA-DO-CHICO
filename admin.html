@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
@@ -51,6 +51,7 @@
             <button class="admin-nav-btn" data-section="history"><i class="fa-solid fa-clock-rotate-left"></i>
                 Histórico</button>
             <button class="admin-nav-btn" data-section="products"><i class="fa-solid fa-box"></i> Produtos</button>
+            <button class="admin-nav-btn" data-section="addons"><i class="fa-solid fa-plus-circle"></i> Adicionais</button>
             <button class="admin-nav-btn" data-section="categories"><i class="fa-solid fa-tags"></i> Categorias</button>
             <button class="admin-nav-btn" data-section="delivery"><i class="fa-solid fa-truck"></i> Taxas de
                 Entrega</button>
@@ -334,6 +335,35 @@
                         <!-- Produtos carregados via JS -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- Adicionais (Add-ons) -->
+        <div id="addons" class="admin-section">
+            <div class="admin-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                    <h2><i class="fa-solid fa-plus-circle"></i> Gestão de Adicionais</h2>
+                    <button class="btn btn-success" onclick="adminSystem.openAddonModal()">
+                        <i class="fa-solid fa-plus"></i> Novo Adicional
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Preço</th>
+                                <th>Categoria Vinculada</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="addons-table-body">
+                            <!-- Adicionais renderizados aqui -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -804,6 +834,59 @@
                     </button>
                     <button type="submit" class="btn btn-success">
                         <span id="modal-submit-text">Adicionar Produto</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Adicionais -->
+    <div id="addon-modal" class="product-modal">
+        <div class="modal-content" style="max-width: 500px; width: 90%;">
+            <div class="modal-header">
+                <h2 id="addon-modal-title"><i class="fa-solid fa-plus-circle"></i> Novo Adicional</h2>
+                <button class="modal-close" onclick="adminSystem.closeAddonModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="addon-form" onsubmit="adminSystem.saveAddon(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="addon-edit-id">
+
+                    <div class="form-group">
+                        <label class="form-label">Nome do Adicional *</label>
+                        <input type="text" id="addon-name" class="form-input" placeholder="Ex: Bacon Extra" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Preço (R$) *</label>
+                        <input type="number" id="addon-price" class="form-input" placeholder="3.50" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Vinculado a qual categoria?</label>
+                        <select id="addon-category" class="form-input">
+                            <option value="">Todas as Categorias (Geral)</option>
+                            <!-- Categorias renderizadas via JS -->
+                        </select>
+                        <p style="font-size: 0.85rem; color: var(--gray); margin-top: 4px;">Se não selecionar nenhuma, o adicional valerá para qualquer produto.</p>
+                    </div>
+
+                    <div class="form-group" style="margin-top: var(--spacing-md);">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="addon-active" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-label" style="font-weight: 500; margin-left: var(--spacing-sm);">Adicional Disponível</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="adminSystem.closeAddonModal()">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-success">
+                        Salvar Adicional
                     </button>
                 </div>
             </form>

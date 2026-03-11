@@ -1,4 +1,4 @@
-﻿// Sistema de pedidos e carrinho
+// Sistema de pedidos e carrinho
 class OrderSystem {
     constructor() {
         this.data = getData();
@@ -8,12 +8,25 @@ class OrderSystem {
         this._deliveryFeesList = [];
         this.coupon = null;   // objeto do cupom ativo
         this.discount = 0;      // valor do desconto calculado
+        this.pendingProduct = null; // para segurar a adição durante o popup de adicionais
         this.init();
     }
 
     init() {
         this.renderCart();
         this.setupEventListeners();
+
+        // Escuta quando os dados do Supabase chegarem (pode demorar alguns ms)
+        window.addEventListener('dataLoaded', (e) => {
+            this.data = e.detail || getData();
+            this.renderCart();
+            // Se ainda há um produto pendente de URL, tenta processar agora
+            if (this._pendingUrlProduct) {
+                this.addToCart(this._pendingUrlProduct);
+                this._pendingUrlProduct = null;
+            }
+        });
+
         this.loadProductFromURL();
     }
 
@@ -30,31 +43,127 @@ class OrderSystem {
     }
 
     // Adiciona produto ao carrinho
-    addToCart(productId, quantity = 1) {
+    addToCart(productId, quantity = 1, skipAddons = false) {
         const product = this.data.products.find(p => p.id === productId);
         if (!product) return;
 
-        const existingItem = this.cart.find(item => item.id === productId);
+        // Se tem adicionais disponíveis (cadastrados e ativos)
+        // Só continua livremente se o usuario já passou pelo Modal (skipAddons = true) ou rejeitou.
+        if (!skipAddons && this.data.addons && this.data.addons.length > 0) {
+            const availableAddons = this.data.addons.filter(a => a.active && (!a.categoryId || a.categoryId === product.category));
+            
+            if (availableAddons.length > 0) {
+                this.pendingProduct = { productId, quantity };
+                this.showAddonSelectionModal(product, availableAddons);
+                return; // Interrompe! A continuação ocorrerá nas funções do Modal
+            }
+        }
+
+        // Continua a inserção do produto limpo caso não existam adicionais ou a inserção seja direta
+        const existingItem = this.cart.find(item => item.id === productId && (!item.selectedAddons || item.selectedAddons.length === 0));
 
         if (existingItem) {
             existingItem.quantity += quantity;
         } else {
-            this.cart.push({ ...product, quantity });
+            this.cart.push({ ...product, quantity, selectedAddons: [] });
         }
 
         this.saveCart();
         this.showNotification(`${product.name} adicionado ao carrinho!`);
     }
 
+    // Modal de Interceptação do Carrinho (Cliente escolhe adicionais)
+    showAddonSelectionModal(product, addons) {
+        document.getElementById('addon-product-name').textContent = product.name;
+        
+        const listEl = document.getElementById('addon-selection-list');
+        listEl.innerHTML = addons.map(addon => `
+            <label class="delivery-option" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; text-align: left; cursor: pointer;">
+                <div>
+                    <input type="checkbox" class="addon-checkbox" value="${addon.id}" data-price="${addon.price}" data-name="${addon.name}" style="margin-right: 10px; width:18px; height:18px; accent-color: var(--primary);">
+                    <span style="font-weight: 600;">${addon.name}</span>
+                </div>
+                <div style="color: var(--primary); font-weight: 700;">+ ${app.formatPrice(addon.price)}</div>
+            </label>
+        `).join('');
+
+        document.getElementById('addon-selection-modal').classList.add('active');
+    }
+
+    closeAddonSelectionModal() {
+        document.getElementById('addon-selection-modal').classList.remove('active');
+        this.pendingProduct = null;
+    }
+
+    // Acionado pelo Modal (Confirma e injeta a Variação Única no Carrinho)
+    confirmAddons(skipAll = false) {
+        if (!this.pendingProduct) return;
+        
+        const product = this.data.products.find(p => p.id === this.pendingProduct.productId);
+        if (!product) { this.closeAddonSelectionModal(); return; }
+
+        if (skipAll) {
+            // Insere limpo
+            this.addToCart(this.pendingProduct.productId, this.pendingProduct.quantity, true);
+            this.closeAddonSelectionModal();
+            return;
+        }
+
+        const checkboxes = document.querySelectorAll('.addon-checkbox:checked');
+        const selectedAddons = Array.from(checkboxes).map(cb => ({
+            id: cb.value,
+            name: cb.dataset.name,
+            price: parseFloat(cb.dataset.price)
+        }));
+
+        if (selectedAddons.length === 0) {
+            this.addToCart(this.pendingProduct.productId, this.pendingProduct.quantity, true);
+        } else {
+            // Verifica se no carrinho já existe ESSE EXACTO produto com ESSES EXACTOS addons
+            const existingSameVariation = this.cart.find(item => {
+                if (item.id !== product.id) return false;
+                const iAddons = item.selectedAddons || [];
+                if (iAddons.length !== selectedAddons.length) return false;
+                
+                // compara sorted IDs
+                const ids1 = iAddons.map(a => a.id).sort().join(',');
+                const ids2 = selectedAddons.map(a => a.id).sort().join(',');
+                return ids1 === ids2;
+            });
+
+            if (existingSameVariation) {
+                existingSameVariation.quantity += this.pendingProduct.quantity;
+            } else {
+                // Cria um item totalmente novo no carrinho com o mix de Addons
+                // O ID visual para Remoção no carrinho precisa ser unico se tiver adicionais variados para a pizza X e Y, portanto vou injetar o cartItemId
+                this.cart.push({ ...product, cartItemId: Date.now() + Math.random(), quantity: this.pendingProduct.quantity, selectedAddons });
+            }
+
+            this.saveCart();
+            this.showNotification(`${product.name} (com adicionais) inserido!`);
+        }
+
+        this.closeAddonSelectionModal();
+    }
+
     // Remove produto do carrinho
-    removeFromCart(productId) {
-        this.cart = this.cart.filter(item => item.id !== productId);
+    removeFromCart(identifier) {
+        this.cart = this.cart.filter(item => {
+            if (item.cartItemId && String(item.cartItemId) === String(identifier)) return false;
+            if (!item.cartItemId && String(item.id) === String(identifier)) return false;
+            return true;
+        });
         this.saveCart();
     }
 
     // Atualiza quantidade
-    updateQuantity(productId, quantity) {
-        const item = this.cart.find(item => item.id === productId);
+    updateQuantity(identifier, quantity) {
+        const item = this.cart.find(item => {
+            if (item.cartItemId && String(item.cartItemId) === String(identifier)) return true;
+            if (!item.cartItemId && String(item.id) === String(identifier)) return true;
+            return false;
+        });
+        
         if (item) {
             item.quantity = Math.max(1, quantity);
             this.saveCart();
@@ -69,7 +178,11 @@ class OrderSystem {
 
     // Calcula subtotal
     getSubtotal() {
-        return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+        return this.cart.reduce((total, item) => {
+            const basePrice = item.price;
+            const addonsPrice = (item.selectedAddons || []).reduce((sum, a) => sum + parseFloat(a.price), 0);
+            return total + ((basePrice + addonsPrice) * item.quantity);
+        }, 0);
     }
 
     // Calcula total (com desconto de cupom se houver)
@@ -241,20 +354,36 @@ class OrderSystem {
         if (cartSummary) cartSummary.classList.remove('hidden');
 
         if (cartItems) {
-            cartItems.innerHTML = this.cart.map(item => `
+            cartItems.innerHTML = this.cart.map(item => {
+                const identifier = item.cartItemId ? item.cartItemId : item.id;
+                
+                let addonsHtml = '';
+                let addonsTotal = 0;
+                
+                if (item.selectedAddons && item.selectedAddons.length > 0) {
+                    addonsHtml = '<ul style="margin: 4px 0 0 0; padding-left: 16px; font-size: 0.85rem; color: var(--gray);">' +
+                        item.selectedAddons.map(a => `<li>+ ${a.name} (${app.formatPrice(a.price)})</li>`).join('') +
+                        '</ul>';
+                    addonsTotal = item.selectedAddons.reduce((sum, a) => sum + parseFloat(a.price), 0);
+                }
+                
+                const unitPrice = item.price + addonsTotal;
+
+                return `
         <div class="cart-item">
           <div class="cart-item-info">
             <h4>${item.name}</h4>
-            <p class="cart-item-price">${app.formatPrice(item.price)}</p>
+            ${addonsHtml}
+            <p class="cart-item-price" style="margin-top: 4px;">${app.formatPrice(unitPrice)} <span style="font-size: 0.8em; font-weight: normal; color: var(--gray);">(unid)</span></p>
           </div>
           <div class="cart-item-controls">
-            <button class="quantity-btn" onclick="orderSystem.updateQuantity('${item.id}', ${item.quantity - 1})">-</button>
+            <button class="quantity-btn" onclick="orderSystem.updateQuantity('${identifier}', ${item.quantity - 1})">-</button>
             <span class="quantity">${item.quantity}</span>
-            <button class="quantity-btn" onclick="orderSystem.updateQuantity('${item.id}', ${item.quantity + 1})">+</button>
-            <button class="remove-btn" onclick="orderSystem.removeFromCart('${item.id}')">&#x1F5D1;&#xFE0F;</button>
+            <button class="quantity-btn" onclick="orderSystem.updateQuantity('${identifier}', ${item.quantity + 1})">+</button>
+            <button class="remove-btn" onclick="orderSystem.removeFromCart('${identifier}')">&#x1F5D1;&#xFE0F;</button>
           </div>
         </div>
-      `).join('');
+      `}).join('');
         }
 
         // Atualiza resumo
@@ -412,9 +541,17 @@ class OrderSystem {
     loadProductFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('product');
-        if (productId) {
+        if (!productId) return;
+
+        // Limpa o parâmetro da URL imediatamente para não reprocessar no reload
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Se os dados já carregaram (tem produtos), adiciona direto
+        if (this.data.products && this.data.products.length > 0) {
             this.addToCart(productId);
-            window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            // Guarda para tentar quando o dataLoaded disparar
+            this._pendingUrlProduct = productId;
         }
     }
 
@@ -483,7 +620,8 @@ class OrderSystem {
                         id: item.id,
                         name: item.name,
                         price: item.price,
-                        quantity: item.quantity
+                        quantity: item.quantity,
+                        selectedAddons: item.selectedAddons || []
                     })),
                     subtotal: this.getSubtotal(),
                     deliveryFee: this.deliveryFee || 0,
@@ -556,8 +694,22 @@ class OrderSystem {
         // Itens do pedido
         message += `*ITENS DO PEDIDO:*\n`;
         this.cart.forEach(item => {
-            message += `\n- ${item.quantity}x ${item.name}\n`;
-            message += `  ${app.formatPrice(item.price)} cada = ${app.formatPrice(item.price * item.quantity)}\n`;
+            message += `\n- ${item.quantity}x ${item.name}`;
+            
+            let addonsTotal = 0;
+            if (item.selectedAddons && item.selectedAddons.length > 0) {
+                message += `\n  *+ Extras:*`;
+                item.selectedAddons.forEach(a => {
+                    message += `\n    - ${a.name} (${app.formatPrice(a.price)})`;
+                    addonsTotal += parseFloat(a.price);
+                });
+                message += `\n`;
+            } else {
+                message += `\n`;
+            }
+            
+            const unitPrice = item.price + addonsTotal;
+            message += `  ${app.formatPrice(unitPrice)} cada = ${app.formatPrice(unitPrice * item.quantity)}\n`;
         });
 
         // Resumo financeiro
