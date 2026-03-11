@@ -25,10 +25,18 @@ class UaiPizzaria {
             taglineEl.textContent = cfg.tagline || msg.tagline;
         }
 
-        // Banner de entrega grátis
+        // Banner de entrega grátis - atualizando preservando ícones
         const bannerEl = document.querySelector('.hero-banner-text, [data-delivery-banner]');
         if (bannerEl && (cfg.deliveryBanner || msg.deliveryBanner)) {
-            bannerEl.textContent = cfg.deliveryBanner || msg.deliveryBanner;
+            // Se houver um <i> dentro do banner, preserva ele
+            const icon = bannerEl.querySelector('i');
+            if (icon) {
+                bannerEl.innerHTML = '';
+                bannerEl.appendChild(icon);
+                bannerEl.appendChild(document.createTextNode(' ' + (cfg.deliveryBanner || msg.deliveryBanner)));
+            } else {
+                bannerEl.textContent = cfg.deliveryBanner || msg.deliveryBanner;
+            }
         }
 
         // Atualiza link do WhatsApp flutuante
@@ -99,14 +107,15 @@ class UaiPizzaria {
         }
 
         const hour = new Date().getHours();
-        let greeting = 'Olá, seja bem-vindo';
+        let greeting = 'Olá';
+        const customWelcome = this.data?.messages?.welcome || 'seja bem-vindo';
 
         if (hour >= 5 && hour < 12) {
-            greeting = 'Bom dia, seja bem-vindo';
+            greeting = `Bom dia, ${customWelcome}`;
         } else if (hour >= 12 && hour < 18) {
-            greeting = 'Boa tarde, seja bem-vindo';
+            greeting = `Boa tarde, ${customWelcome}`;
         } else {
-            greeting = 'Boa noite, seja bem-vindo';
+            greeting = `Boa noite, ${customWelcome}`;
         }
 
         greetingElement.textContent = greeting;
