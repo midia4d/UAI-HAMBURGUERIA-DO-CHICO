@@ -1,4 +1,4 @@
-﻿// Sistema de administração
+// Sistema de administração
 class AdminSystem {
     constructor() {
         this.data = getData();
@@ -1327,10 +1327,12 @@ class AdminSystem {
                 pix_key: (document.getElementById('pix-key')?.value || '').trim()
             };
 
-            // Se digitou algo na senha, atualiza
-            const newPassword = document.getElementById('admin-password-input').value;
-            if (newPassword && newPassword.trim() !== '') {
-                configData.admin_password = newPassword.trim();
+            // Se digitou algo na senha E é diferente da atual, atualiza
+            const newPassword = document.getElementById('admin-password-input').value.trim();
+            const currentPassword = this.data?.config?.adminPassword || this.data?.config?.admin_password || '';
+            const passwordWasChanged = newPassword !== '' && newPassword !== currentPassword;
+            if (passwordWasChanged) {
+                configData.admin_password = newPassword;
             }
 
             // Objeto StoreInfo
@@ -1354,9 +1356,9 @@ class AdminSystem {
                 // Força um recarregamento dos dados
                 await refreshData();
                 this.data = getData();
-                if (newPassword && newPassword.trim() !== '') {
-                    this.showAlert('Senha alterada. Você precisará logar novamente.', 'warning');
-                    setTimeout(() => this.logout(), 2000);
+                if (passwordWasChanged) {
+                    this.showAlert('Senha alterada! Faça login novamente.', 'warning');
+                    setTimeout(() => this.logout(), 2500);
                 }
             } else {
                 this.showAlert('Erro ao salvar algumas configurações.', 'danger');
