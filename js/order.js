@@ -83,7 +83,7 @@ class OrderSystem {
                     <input type="checkbox" class="addon-checkbox" value="${addon.id}" data-price="${addon.price}" data-name="${addon.name}" style="margin-right: 10px; width:18px; height:18px; accent-color: var(--primary);">
                     <span style="font-weight: 600;">${addon.name}</span>
                 </div>
-                <div style="color: var(--primary); font-weight: 700;">+ ${app.formatPrice(addon.price)}</div>
+                <div style="color: var(--primary); font-weight: 700;">+ ${window.app.formatPrice(addon.price)}</div>
             </label>
         `).join('');
 
