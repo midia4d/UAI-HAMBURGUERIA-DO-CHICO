@@ -780,16 +780,16 @@ class OrderSystem {
 }
 
 // Inicializa sistema de pedidos
-let orderSystem;
+window.orderSystem = null;
 
 window.addEventListener('dataLoaded', () => {
-    if (!orderSystem) {
-        orderSystem = new OrderSystem();
+    if (!window.orderSystem) {
+        window.orderSystem = new OrderSystem();
     }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof cachedData !== 'undefined' && cachedData !== null && !orderSystem) {
-        orderSystem = new OrderSystem();
+    if (typeof cachedData !== 'undefined' && cachedData !== null && !window.orderSystem) {
+        window.orderSystem = new OrderSystem();
     }
 });
