@@ -107,18 +107,23 @@ class UaiPizzaria {
         }
 
         const hour = new Date().getHours();
-        let greeting = 'Olá';
+        let greetingPrefix = 'Olá';
         const customWelcome = this.data?.messages?.welcome || 'seja bem-vindo';
 
         if (hour >= 5 && hour < 12) {
-            greeting = `Bom dia, ${customWelcome}`;
+            greetingPrefix = 'Bom dia';
         } else if (hour >= 12 && hour < 18) {
-            greeting = `Boa tarde, ${customWelcome}`;
+            greetingPrefix = 'Boa tarde';
         } else {
-            greeting = `Boa noite, ${customWelcome}`;
+            greetingPrefix = 'Boa noite';
         }
 
-        greetingElement.textContent = greeting;
+        // Evita duplicar se o usuário já escreveu "Boa noite" na mensagem personalizada
+        const finalGreeting = customWelcome.toLowerCase().startsWith(greetingPrefix.toLowerCase()) 
+            ? customWelcome 
+            : `${greetingPrefix}, ${customWelcome}`;
+
+        greetingElement.textContent = finalGreeting;
     }
 
     // Mostra mensagem de fechado

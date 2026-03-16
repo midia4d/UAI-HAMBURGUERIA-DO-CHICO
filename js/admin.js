@@ -1332,7 +1332,7 @@ class AdminSystem {
             const currentPassword = this.data?.config?.adminPassword || this.data?.config?.admin_password || '';
             const passwordWasChanged = newPassword !== '' && newPassword !== currentPassword;
             if (passwordWasChanged) {
-                configData.admin_password = newPassword;
+                configData.adminPassword = newPassword;
             }
 
             // Objeto StoreInfo
