@@ -175,6 +175,9 @@ class AdminSystem {
             case 'categories':
                 this.loadCategories();
                 break;
+            case 'addons':
+                this.loadAddons();
+                break;
             case 'orders':
                 this.loadOrders();
                 // Limpa badge ao entrar na aba
@@ -1372,6 +1375,134 @@ class AdminSystem {
                 btn.disabled = false;
                 btn.innerHTML = 'Salvar Todas as Configurações';
             }
+        }
+    }
+
+    // ============================================
+    // ADICIONAIS
+    // ============================================
+
+    loadAddons() {
+        const tbody = document.getElementById('addons-table-body');
+        if (!tbody) return;
+
+        if (!this.data.addons || this.data.addons.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center" style="padding:2rem;color:var(--gray);">Nenhum adicional cadastrado.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = this.data.addons.map(addon => {
+            const category = addon.categoryId ? (this.data.categories.find(c => c.id == addon.categoryId)?.name || 'Desconhecida') : 'Todas (Geral)';
+            return `
+            <tr>
+                <td><strong>${addon.name}</strong></td>
+                <td>R$ ${parseFloat(addon.price).toFixed(2).replace('.', ',')}</td>
+                <td><span class="badge" style="background:var(--cream);color:var(--gray);">${category}</span></td>
+                <td>
+                    <span class="status-badge ${addon.active ? 'status-active' : 'status-inactive'}">
+                        ${addon.active ? 'Ativo' : 'Inativo'}
+                    </span>
+                </td>
+                <td>
+                    <button class="btn btn-small btn-warning" onclick="adminSystem.openAddonModal(${addon.id})">Editar</button>
+                    <button class="btn btn-small btn-danger" onclick="adminSystem.deleteAddon(${addon.id})">Excluir</button>
+                </td>
+            </tr>
+            `;
+        }).join('');
+    }
+
+    openAddonModal(id = null) {
+        document.getElementById('addon-form').reset();
+        document.getElementById('addon-edit-id').value = '';
+
+        const catSelect = document.getElementById('addon-category');
+        if (catSelect) {
+            catSelect.innerHTML = '<option value="">Todas as Categorias (Geral)</option>' +
+                this.data.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        if (id) {
+            const addon = this.data.addons.find(a => a.id == id);
+            if (addon) {
+                document.getElementById('addon-edit-id').value = addon.id;
+                document.getElementById('addon-name').value = addon.name;
+                document.getElementById('addon-price').value = addon.price;
+                if (catSelect) catSelect.value = addon.categoryId || '';
+                document.getElementById('addon-active').checked = addon.active !== false;
+                document.getElementById('addon-modal-title').innerHTML = '<i class="fa-solid fa-pen"></i> Editar Adicional';
+            }
+        } else {
+            document.getElementById('addon-active').checked = true;
+            document.getElementById('addon-modal-title').innerHTML = '<i class="fa-solid fa-plus-circle"></i> Novo Adicional';
+        }
+
+        document.getElementById('addon-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeAddonModal() {
+        document.getElementById('addon-modal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    async saveAddon(e) {
+        e.preventDefault();
+        const id = document.getElementById('addon-edit-id').value;
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+
+        const rawCat = document.getElementById('addon-category').value;
+        
+        const addonData = {
+            name: document.getElementById('addon-name').value,
+            price: parseFloat(document.getElementById('addon-price').value),
+            categoryId: rawCat ? rawCat : null,
+            active: document.getElementById('addon-active').checked
+        };
+
+        try {
+            let res;
+            if (id) {
+                res = await dbManager.updateAddon(parseInt(id), addonData);
+            } else {
+                res = await dbManager.addAddon(addonData);
+            }
+
+            if (res.success) {
+                this.showAlert('Adicional salvo com sucesso!', 'success');
+                this.closeAddonModal();
+                await refreshData();
+                this.data = getData();
+                this.loadAddons();
+            } else {
+                this.showAlert('Erro ao salvar adicional: ' + res.error, 'danger');
+            }
+        } catch (err) {
+            this.showAlert('Erro inesperado ao salvar adicional', 'danger');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
+    async deleteAddon(id) {
+        if (!confirm('Excluir este adicional permanentemente?')) return;
+        
+        try {
+            const res = await dbManager.deleteAddon(parseInt(id));
+            if (res.success) {
+                this.showAlert('Adicional excluído!', 'success');
+                await refreshData();
+                this.data = getData();
+                this.loadAddons();
+            } else {
+                this.showAlert('Erro ao excluir adicional: ' + res.error, 'danger');
+            }
+        } catch (err) {
+            this.showAlert('Erro inesperado', 'danger');
         }
     }
 

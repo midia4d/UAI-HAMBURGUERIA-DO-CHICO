@@ -61,6 +61,42 @@ class UaiPizzaria {
                 btn.title = 'Pedidos desabilitados no momento';
             });
         }
+
+        // --- INFORMAÇÕES DA LOJA (RODAPÉ) ---
+        const store = this.data.storeInfo || {};
+        
+        // Atualiza horas de funcionamento no rodapé
+        const hrWeekEls = document.querySelectorAll('#footer-hours-weekdays');
+        const hrSunEls = document.querySelectorAll('#footer-hours-sunday');
+        if (store.hours) {
+            hrWeekEls.forEach(el => el.textContent = store.hours.weekdays || 'Segunda a Sábado: 16:00 às 03:00');
+            hrSunEls.forEach(el => el.textContent = store.hours.sunday || 'Domingo: 20:00 às 03:00');
+        }
+
+        // Atualiza Endereço
+        const addrEls = document.querySelectorAll('#footer-address');
+        addrEls.forEach(el => el.textContent = store.address || 'Rua Alagoas, 70B – Cristo Redentor');
+        
+        const compEls = document.querySelectorAll('#footer-address-complement');
+        compEls.forEach(el => el.textContent = store.addressComplement || 'Do lado do Hotel Mirian / atrás da rodoviária');
+
+        // Atualiza Instagram no rodapé
+        const igEls = document.querySelectorAll('#footer-instagram');
+        igEls.forEach(el => {
+            const igHandle = store.instagram || '@uaihamburgueriadochico';
+            el.innerHTML = `<i class="fab fa-instagram"></i> ${igHandle}`;
+            el.href = `https://instagram.com/${igHandle.replace('@', '')}`;
+            el.target = '_blank';
+        });
+
+        const wppFooterEls = document.querySelectorAll('#footer-whatsapp');
+        wppFooterEls.forEach(el => {
+            el.innerHTML = `<i class="fab fa-whatsapp"></i> WhatsApp`;
+            if (cfg.whatsappNumber) {
+                el.href = `https://wa.me/${cfg.whatsappNumber}`;
+                el.target = '_blank';
+            }
+        });
     }
 
     // Verifica se o site está pausado
