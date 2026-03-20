@@ -569,21 +569,30 @@ class AdminSystem {
     }
 
     // Adiciona taxa de entrega
-    addDeliveryFee() {
+    async addDeliveryFee() {
         const neighborhood = prompt('Nome do bairro:');
         if (!neighborhood) return;
 
         const fee = parseFloat(prompt('Taxa de entrega:'));
         if (isNaN(fee)) return;
 
-        this.data.deliveryFees.push({ neighborhood, fee });
-        saveData(this.data);
-        this.loadDeliveryFees();
-        this.showAlert('Taxa adicionada com sucesso!', 'success');
+        try {
+            const res = await dbManager.addDeliveryFee(neighborhood, fee);
+            if (res.success) {
+                this.showAlert('Taxa adicionada com sucesso!', 'success');
+                await refreshData();
+                this.data = getData();
+                this.loadDeliveryFees();
+            } else {
+                this.showAlert('Erro ao adicionar taxa: ' + res.error, 'danger');
+            }
+        } catch (err) {
+            this.showAlert('Erro inesperado', 'danger');
+        }
     }
 
     // Edita taxa de entrega
-    editDeliveryFee(index) {
+    async editDeliveryFee(index) {
         const deliveryFee = this.data.deliveryFees[index];
 
         const neighborhood = prompt('Nome do bairro:', deliveryFee.neighborhood);
@@ -592,20 +601,39 @@ class AdminSystem {
         const fee = parseFloat(prompt('Taxa de entrega:', deliveryFee.fee));
         if (isNaN(fee)) return;
 
-        this.data.deliveryFees[index] = { neighborhood, fee };
-        saveData(this.data);
-        this.loadDeliveryFees();
-        this.showAlert('Taxa atualizada com sucesso!', 'success');
+        try {
+            const res = await dbManager.updateDeliveryFee(deliveryFee.id, neighborhood, fee);
+            if (res.success) {
+                this.showAlert('Taxa atualizada com sucesso!', 'success');
+                await refreshData();
+                this.data = getData();
+                this.loadDeliveryFees();
+            } else {
+                this.showAlert('Erro ao atualizar taxa: ' + res.error, 'danger');
+            }
+        } catch (err) {
+            this.showAlert('Erro inesperado', 'danger');
+        }
     }
 
     // Deleta taxa de entrega
-    deleteDeliveryFee(index) {
+    async deleteDeliveryFee(index) {
+        const deliveryFee = this.data.deliveryFees[index];
         if (!confirm('Tem certeza que deseja excluir esta taxa?')) return;
 
-        this.data.deliveryFees.splice(index, 1);
-        saveData(this.data);
-        this.loadDeliveryFees();
-        this.showAlert('Taxa excluída com sucesso!', 'success');
+        try {
+            const res = await dbManager.deleteDeliveryFee(deliveryFee.id);
+            if (res.success) {
+                this.showAlert('Taxa excluída com sucesso!', 'success');
+                await refreshData();
+                this.data = getData();
+                this.loadDeliveryFees();
+            } else {
+                this.showAlert('Erro ao excluir taxa: ' + res.error, 'danger');
+            }
+        } catch (err) {
+            this.showAlert('Erro inesperado', 'danger');
+        }
     }
 
     // Exporta dados
