@@ -50,8 +50,14 @@ class OrderSystem {
         // Se tem adicionais disponíveis (cadastrados e ativos)
         // Só continua livremente se o usuario já passou pelo Modal (skipAddons = true) ou rejeitou.
         if (!skipAddons && this.data.addons && this.data.addons.length > 0) {
-            const availableAddons = this.data.addons.filter(a => a.active && (!a.categoryId || a.categoryId === product.category));
-            
+            const availableAddons = this.data.addons.filter(a => {
+                if (!a.active) return false;
+                // Se o adicional não tem categoria restrita, serve para qualquer produto
+                if (!a.categoryId) return true;
+                // Compara como string para evitar int vs string mismatch
+                return String(a.categoryId) === String(product.categoryId || product.category);
+            });
+
             if (availableAddons.length > 0) {
                 this.pendingProduct = { productId, quantity };
                 this.showAddonSelectionModal(product, availableAddons);
@@ -746,6 +752,12 @@ class OrderSystem {
                     message += `(Por favor, envie o comprovante logo abaixo desta mensagem)\n`;
                 }
             }
+        }
+
+        // Observação do pedido
+        const notes = document.getElementById('order-notes')?.value?.trim();
+        if (notes) {
+            message += `\n*OBSERVAÇÃO:*\n${notes}\n`;
         }
 
         // Link de rastreio

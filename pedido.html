@@ -398,6 +398,17 @@
 
                     </div>
 
+                    <!-- Observação do Pedido -->
+                    <div class="card mt-2">
+                        <h2><i class="fa-solid fa-comment-dots"></i> Observação</h2>
+                        <div class="form-group" style="margin-bottom:0">
+                            <label class="form-label" for="order-notes">Alguma observação para o seu pedido?</label>
+                            <textarea id="order-notes" class="form-input" rows="3"
+                                placeholder="Ex: Sem cebola, sem picles, ponto da carne bem-passada..."
+                                style="resize: vertical; font-family: inherit;"></textarea>
+                        </div>
+                    </div>
+
                     <!-- Cupom de Desconto -->
                     <div class="card mt-2">
                         <h2><i class="fa-solid fa-tag"></i> Cupom de Desconto</h2>
@@ -570,22 +581,65 @@
     <script src="js/main.js?v=3" defer></script>
     <script src="js/order.js?v=3" defer></script>
     <script>
+        // Menu toggle (3 barrinhas)
         document.addEventListener('DOMContentLoaded', () => {
-            const data = getData();
+            const toggle = document.querySelector('.menu-toggle');
+            const menu = document.querySelector('.nav-menu');
+            if (toggle && menu) {
+                toggle.addEventListener('click', () => {
+                    toggle.classList.toggle('active');
+                    menu.classList.toggle('active');
+                    document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+                });
+                menu.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        toggle.classList.remove('active');
+                        menu.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
 
-            // Atualiza endereço de retirada
-            document.getElementById('pickup-address').textContent = data.storeInfo.address;
-            document.getElementById('pickup-complement').textContent = data.storeInfo.addressComplement;
+            // Popula campos com dados do Supabase ao carregar
+            function populatePage(data) {
+                const storeInfo = data?.storeInfo || {};
+                const cfg = data?.config || {};
+                if (document.getElementById('pickup-address')) {
+                    document.getElementById('pickup-address').textContent = storeInfo.address || '';
+                }
+                if (document.getElementById('pickup-complement')) {
+                    document.getElementById('pickup-complement').textContent = storeInfo.addressComplement || '';
+                }
+                if (document.getElementById('footer-hours-weekdays')) {
+                    document.getElementById('footer-hours-weekdays').textContent = storeInfo.hours?.weekdays || '';
+                }
+                if (document.getElementById('footer-hours-sunday')) {
+                    document.getElementById('footer-hours-sunday').textContent = storeInfo.hours?.sunday || '';
+                }
+                if (document.getElementById('footer-address')) {
+                    document.getElementById('footer-address').textContent = storeInfo.address || '';
+                }
+                if (document.getElementById('footer-address-complement')) {
+                    document.getElementById('footer-address-complement').textContent = storeInfo.addressComplement || '';
+                }
+                if (document.getElementById('footer-whatsapp') && cfg.whatsappNumber) {
+                    document.getElementById('footer-whatsapp').href = `https://wa.me/${cfg.whatsappNumber}`;
+                }
+                if (document.getElementById('footer-instagram') && storeInfo.instagram) {
+                    document.getElementById('footer-instagram').href = `https://instagram.com/${storeInfo.instagram.replace('@', '')}`;
+                }
+            }
 
-            // Atualiza footer
-            document.getElementById('footer-hours-weekdays').textContent = data.storeInfo.hours.weekdays;
-            document.getElementById('footer-hours-sunday').textContent = data.storeInfo.hours.sunday;
-            document.getElementById('footer-address').textContent = data.storeInfo.address;
-            document.getElementById('footer-address-complement').textContent = data.storeInfo.addressComplement;
+            // Tenta carregar imediatamente (dado já em cache)
+            try {
+                const d = getData();
+                if (d && d.storeInfo) populatePage(d);
+            } catch(e) {}
 
-            const whatsappLink = `https://wa.me/${data.config.whatsappNumber}`;
-            document.getElementById('footer-whatsapp').href = whatsappLink;
-            document.getElementById('footer-instagram').href = `https://instagram.com/${data.storeInfo.instagram.replace('@', '')}`;
+            // Também escuta o evento async do Supabase
+            window.addEventListener('dataLoaded', (e) => {
+                populatePage(e.detail || {});
+            });
         });
     </script>
 </body>
