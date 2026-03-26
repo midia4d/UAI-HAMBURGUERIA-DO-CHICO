@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // CLIENTE SUPABASE - UAI HAMBURGUERIA DO CHICO
 // ============================================
 
@@ -267,6 +267,26 @@ class SupabaseDataManager {
 
     // ============================================
     // ADICIONAIS (ADD-ONS)
+    // ============================================
+    // PEDIDOS
+    // ============================================
+
+    async getOrderById(id) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('orders')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+            return { success: true, data };
+        } catch (error) {
+            console.error('Erro ao buscar pedido por ID:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
     // ============================================
 
     async getAddons(forceRefresh = false) {

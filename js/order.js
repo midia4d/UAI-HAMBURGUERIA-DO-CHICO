@@ -729,14 +729,21 @@ class OrderSystem {
         // Forma de pagamento
         const payRadio = document.querySelector('input[name="payment-method"]:checked');
         if (payRadio) {
-            const labels = { dinheiro: 'Dinheiro', pix: 'PIX', credito: 'Cartao de Credito', debito: 'Cartao de Debito' };
+            const labels = { dinheiro: 'Dinheiro', pix: 'PIX', credito: 'Cartão de Crédito', debito: 'Cartão de Débito' };
             message += `\n*PAGAMENTO:* ${labels[payRadio.value] || payRadio.value}\n`;
+            
             if (payRadio.value === 'dinheiro') {
                 const troco = document.getElementById('troco-valor')?.value?.trim();
                 if (troco && parseFloat(troco) > 0) {
                     message += `Troco para: R$ ${parseFloat(troco).toFixed(2).replace('.', ',')}\n`;
                 } else {
-                    message += `Sem troco necessario\n`;
+                    message += `Sem troco necessário\n`;
+                }
+            } else if (payRadio.value === 'pix') {
+                const pixKey = this.data?.config?.pixKey || (typeof cachedData !== 'undefined' && cachedData?.config?.pixKey);
+                if (pixKey) {
+                    message += `*Chave PIX:* ${pixKey}\n`;
+                    message += `(Por favor, envie o comprovante logo abaixo desta mensagem)\n`;
                 }
             }
         }
