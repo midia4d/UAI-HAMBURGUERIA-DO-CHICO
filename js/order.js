@@ -655,19 +655,43 @@ class OrderSystem {
         const message = this.buildWhatsAppMessage(trackingUrl);
         app.openWhatsApp(message);
 
-        // 3. Restaura botao e limpa carrinho
-        if (btn) {
-            btn.disabled = false;
-            btn.textContent = 'Pedido Enviado!';
-        }
+        // 3. Limpa carrinho
         this.clearCart();
 
-        // 4. Redireciona para rastreio se disponivel
-        if (trackingUrl) {
-            setTimeout(() => { window.location.href = trackingUrl; }, 1500);
-        } else {
-            this.showNotification('Pedido enviado! Aguarde confirmacao no WhatsApp.', 'success');
+        // 4. Exibe tela de confirmação com botão de rastreio (o cliente clica após enviar a mensagem)
+        this.showOrderConfirmationScreen(trackingUrl);
+    }
+
+    // Exibe a tela de confirmação após finalizar o pedido
+    showOrderConfirmationScreen(trackingUrl) {
+        // Esconde o conteúdo principal e exibe tela de confirmação
+        const mainContent = document.querySelector('.section');
+        if (!mainContent) {
+            if (trackingUrl) window.location.href = trackingUrl;
+            return;
         }
+
+        mainContent.innerHTML = `
+            <div class="container" style="text-align:center; padding: 60px 20px;">
+                <div style="font-size:5rem; margin-bottom:20px;">✅</div>
+                <h2 style="color: var(--primary); margin-bottom:12px;">Pedido salvo!</h2>
+                <p style="color: var(--gray); margin-bottom:8px; font-size:1rem;">
+                    O WhatsApp foi aberto com seu pedido. <strong>Envie a mensagem</strong> para confirmar com a loja.
+                </p>
+                <p style="color: var(--gray); font-size:0.9rem; margin-bottom:32px;">
+                    Após enviar, clique no botão abaixo para acompanhar seu pedido em tempo real.
+                </p>
+                ${trackingUrl ? `
+                <a href="${trackingUrl}" class="btn btn-primary btn-large" style="display:inline-flex; align-items:center; gap:10px; margin-bottom:12px; text-decoration:none;">
+                    <i class="fa-solid fa-truck"></i> Acompanhar meu Pedido
+                </a>
+                <br>
+                ` : ''}
+                <a href="pedido.html" class="btn btn-secondary" style="display:inline-flex; align-items:center; gap:8px; text-decoration:none; margin-top:8px;">
+                    <i class="fa-solid fa-plus"></i> Fazer outro pedido
+                </a>
+            </div>
+        `;
     }
 
     // Monta mensagem para WhatsApp
