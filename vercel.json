@@ -1,4 +1,11 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/rastreio", "destination": "/rastreio.html" },
+    { "source": "/pedido",   "destination": "/pedido.html"   },
+    { "source": "/admin",    "destination": "/admin.html"    },
+    { "source": "/cardapio", "destination": "/cardapio.html" },
+    { "source": "/info",     "destination": "/info.html"     }
+  ]
 }
