@@ -852,9 +852,7 @@ class AdminSystem {
 
     // Copia o link de rastreio do pedido para a área de transferência
     copyTrackingLink(orderId, btn) {
-        const baseUrl = window.location.origin +
-            window.location.pathname.replace(/admin(\.html)?$/, '');
-        const url = `${baseUrl}rastreio?id=${orderId}`;
+        const url = window.location.origin + '/rastreio?id=' + orderId;
 
         navigator.clipboard.writeText(url).then(() => {
             const original = btn.innerHTML;

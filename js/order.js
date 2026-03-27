@@ -639,9 +639,7 @@ class OrderSystem {
                 if (result.success) {
                     const orderId = result.data?.id;
                     if (orderId) {
-                        trackingUrl = window.location.origin +
-                            window.location.pathname.replace(/pedido(\.html)?$/, '') +
-                            'rastreio?id=' + orderId;
+                        trackingUrl = window.location.origin + '/rastreio?id=' + orderId;
                     }
                 } else {
                     console.error('Erro ao salvar pedido:', result.error);
